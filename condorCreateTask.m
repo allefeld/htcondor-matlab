@@ -1,6 +1,11 @@
 function condorCreateTask(jobHandle, fun, argIn, numArgOut)
 
 % condorCreateTask(jobHandle, fun, argIn, numArgOut = 0)
+%
+% jobHandle:    handle of job the task should be included in
+% fun:          handle of function that should be run
+% argIn:        cell array of parameters to pass to fun
+% numArgOut:    number of outputs of fun that should be saved
 
 jobDir = [condorStorage jobHandle '/'];
 load([jobDir 'job'], 'job')

@@ -6,7 +6,7 @@ jobDir = [condorStorage jobHandle '/'];
 load([jobDir 'job'], 'job')
 
 % generate submit description file
-sdfName = [job.dir 'submit'];
+sdfName = [job.dir 'submit'];                                                   %#ok<NODEF>
 sdf = fopen(sdfName, 'w');
 
 fprintf(sdf, 'Universe            = vanilla\n');
@@ -14,6 +14,11 @@ fprintf(sdf, 'Executable          = %s/bin/matlab\n', matlabroot);
 fprintf(sdf, 'Arguments           = -nodisplay -nojvm\n');
 fprintf(sdf, 'Transfer_Executable = false\n');
 fprintf(sdf, 'Notification        = never\n');
+fprintf(sdf, 'Kill_Sig            = 2\n');
+
+fprintf(sdf, 'Requirements        = (SlotID <= 4)\n');  % HACK to run at most two tasks on one machine
+fprintf(sdf, 'Rank                = Mips\n');
+
 fprintf(sdf, '\n');
 
 for i = 1 : job.numTasks
@@ -40,3 +45,5 @@ fprintf('submitted %s to cluster %d\n', jobHandle, job.cluster)
 
 save([jobDir 'job'], 'job')
 
+% request_disk
+% request_memory
