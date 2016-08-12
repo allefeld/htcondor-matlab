@@ -1,11 +1,28 @@
 function condorCreateTask(jobHandle, fun, argIn, numArgOut)
 
+% define a Condor task and add it to a Condor job
+%
 % condorCreateTask(jobHandle, fun, argIn, numArgOut = 0)
 %
 % jobHandle:    handle of job the task should be included in
 % fun:          handle of function that should be run
 % argIn:        cell array of parameters to pass to fun
 % numArgOut:    number of outputs of fun that should be saved
+%
+%
+% This file is part of the development version of htcondor-matlab, see
+% https://github.com/allefeld/htcondor-matlab
+
+% Copyright (C) 2016 Carsten Allefeld
+%
+% This program is free software: you can redistribute it and/or modify it
+% under the terms of the GNU General Public License as published by the
+% Free Software Foundation, either version 3 of the License, or (at your
+% option) any later version. This program is distributed in the hope that
+% it will be useful, but without any warranty; without even the implied
+% warranty of merchantability or fitness for a particular purpose. See the
+% GNU General Public License <http://www.gnu.org/licenses/> for more details.
+
 
 jobDir = [condorStorage jobHandle '/'];
 load([jobDir 'job'], 'job')
