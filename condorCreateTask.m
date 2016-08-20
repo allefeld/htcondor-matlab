@@ -15,25 +15,26 @@ function condorCreateTask(jobHandle, fun, argIn, numArgOut)
 % Copyright (C) 2016 Carsten Allefeld
 
 
-jobDir = [condorConfig('condir') jobHandle filesep];
-load([jobDir 'job'], 'job')
-
 if nargin < 4
     numArgOut = 0;
 end
+
+% load job data structure
+jobDir = [condorConfig('condir') jobHandle filesep];
+load([jobDir 'job'], 'job')
 
 % generate task data structure
 task = struct;
 task.id = job.numTasks;                                                     %#ok<NODEF>
 task.name = sprintf('%stask%03d', job.dir, task.id);
 task.in = [task.name '_in.m'];  % Matlab input script
-task.out = [task.name '_out'];  % filename for Matlab std out
-task.err = [task.name '_err'];  % filename for Matlab std err
+task.out = [task.name '_out'];  % filename for Matlab standard output
+task.err = [task.name '_err'];  % filename for Matlab standard error
 task.inf = [task.name '_inf'];  % Matlab task information
 task.res = [task.name '_res'];  % filename for Matlab results
 task.log = [task.name '_log'];  % filename for HTCondor log file
 
-% create task information for Matlab process
+% create task information; used in input script
 condorTask = struct;
 condorTask.id = job.numTasks;
 condorTask.fun = fun;
@@ -45,25 +46,28 @@ save(task.inf, 'condorTask');
 
 % create input script for Matlab process
 fid = fopen(task.in, 'w');
-fprintf(fid, 'fprintf(2, ''\\nMatlab started\\n'');\n');
+%  -> print marker for condorMonitorJob to stderr
+fprintf(fid, 'fprintf(2, ''\\ninput script started\\n'');\n');
+%  -> report HTCondor slot and node, uses `condor_config_val`
 fprintf(fid, 'slot = getenv(''_CONDOR_SLOT'');\n');
 fprintf(fid, 'setenv(''LD_LIBRARY_PATH'')\n');
 fprintf(fid, '[~, hostname] = system(''condor_config_val -raw HOSTNAME'');\n');
-fprintf(fid, 'fprintf([''HTCondor job executing on '' slot ''@'' hostname])\n');
+fprintf(fid, 'fprintf([''HTCondor task executing on '' slot ''@'' hostname])\n');
+%  -> prepare to run task
 fprintf(fid, 'clear\n');
 fprintf(fid, 'load(''%s'')\n', task.inf);
 fprintf(fid, 'path(condorTask.path)\n');
 fprintf(fid, 'cd(condorTask.wd)\n');
+%  -> run task and capture results
 fprintf(fid, 'condorResult = cell(1, condorTask.numArgOut);\n');
 fprintf(fid, '[condorResult{:}] = condorTask.fun(condorTask.argIn{:});\n');
+%  -> save results
 fprintf(fid, 'save(''%s'', ''condorResult'')\n', task.res);
 fclose(fid);
 
-% add task to job data structure
+% add task to job data structure and save
 job.numTasks = job.numTasks + 1;
 job.task(job.numTasks) = task;
-
-% save updated job data structure
 save([jobDir 'job'], 'job')
 
 

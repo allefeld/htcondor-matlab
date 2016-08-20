@@ -12,13 +12,17 @@ function results = condorGetResults(jobHandle)
 % Copyright (C) 2016 Carsten Allefeld
 
 
+% load job data structure
 jobDir = [condorConfig('condir') jobHandle filesep];
 load([jobDir 'job'], 'job')
 
+% initialize cell array of results
 results = cell(job.numTasks, 1);
-
+% for each task
 for i = 1 : job.numTasks
+    % if results are ready
     if exist([job.task(i).res '.mat'], 'file')
+        % load them and save them in task's cell
         load(job.task(i).res, 'condorResult')
         results{i} = condorResult;
     else

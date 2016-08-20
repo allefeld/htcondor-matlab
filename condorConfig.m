@@ -21,7 +21,7 @@ function out = condorConfig(name)
 % point to an existing writable directory that is accessible from all machines
 conDir = ['/store02_analysis/' getenv('USER') '/condor/'];
 
-% entries for the HTCondor submit description file 
+% general entries for the HTCondor submit description file 
 % see http://research.cs.wisc.edu/htcondor/manual/v8.2.3/condor_submit.html
 % and http://research.cs.wisc.edu/htcondor/manual/v8.2.3/12_Appendix_A.html
 submit = {'Universe            = vanilla'           % do not change!

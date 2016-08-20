@@ -2,25 +2,25 @@ function y = condorTestTask(x)
 
 % test function to be used as an HTCondor task
 
-% print primary output message
+% print primary message
 fprintf('condorTestTask\n')
 
-% print secondary output message
+% print secondary message
 fprintf(' processing\n')
 
 % compute result
 y = x ^ 2;
-pause(10)   % act as if its taking a while
+pause(10)   % act as if it's taking a while
 
 % simulate error
 if isprime(x)
-    % print secondary output message
+    % print secondary message
     fprintf(' throwing error\n')
     % generate error
     error('bad things happen')
 end
 
-% print secondary output message
+% print secondary message
 fprintf(' finished\n')
 
 

@@ -11,7 +11,23 @@ See ['Submitting Jobs Using a Shared File System'](http://research.cs.wisc.edu/h
 
 Has to be run on one of the HTCondor machines, calls `condor_submit`.
 
-condorMonitorJob assume stdout format
+calls `condor_config_val`
+
+condorMonitorJob assumed stdout format
+
+Example:
+
+    jobHandle = condorCreateJob;
+    for i = 1 : 10
+       condorCreateTask(jobHandle, @condorTestTask, {i}, 1)
+    end
+    condorSubmitJob(jobHandle)
+
+    condorMonitorJob(jobHandle)
+
+    results = condorGetResults(jobHandle);
+    results{:} 
+
 
 ***
 

@@ -10,23 +10,24 @@ function condorSubmitJob(jobHandle)
 % Copyright (C) 2016 Carsten Allefeld
 
 
+% load job data structure
 jobDir = [condorConfig('condir') jobHandle filesep];
 load([jobDir 'job'], 'job')
 
-% generate submit description file
+% generate HTCondor submit description file
 sdfName = [job.dir 'submit'];                                                   %#ok<NODEF>
 sdf = fopen(sdfName, 'w');
-% general job properties
+% get general entries from configuration
 submit = condorConfig('submit');
+% write general entries
 fprintf(sdf, '%s\n', submit{:});
 fprintf(sdf, '\n');
-% tasks
+% write task-specific entries
 for i = 1 : job.numTasks
-    % attempt to do it via -r instead of stdin: fprintf(sdf, 'Arguments           = -nodisplay -nojvm -r \\"try, run(\\''%s\\''); catch me, fprintf(2, getReport(me)), end, quit force\\"\n', job.task(i).in);
-    fprintf(sdf, 'Input               = %s\n', job.task(i).in);
-    fprintf(sdf, 'Output              = %s\n', job.task(i).out);
-    fprintf(sdf, 'Error               = %s\n', job.task(i).err);
-    fprintf(sdf, 'Log                 = %s\n', job.task(i).log);
+    fprintf(sdf, 'Input  = %s\n', job.task(i).in);
+    fprintf(sdf, 'Output = %s\n', job.task(i).out);
+    fprintf(sdf, 'Error  = %s\n', job.task(i).err);
+    fprintf(sdf, 'Log    = %s\n', job.task(i).log);
     fprintf(sdf, 'Queue\n');
     fprintf(sdf, '\n');
 end
@@ -38,9 +39,11 @@ setenv('LD_LIBRARY_PATH')  % avoid shared library problems for `system`
 if status ~= 0
     error(result)
 end
-job.cluster = str2double(result(find(result == ' ', 1, 'last') + 1 : end - 2));
-fprintf('submitted %s to cluster %d\n', jobHandle, job.cluster)
+jobCluster = str2double(result(find(result == ' ', 1, 'last') + 1 : end - 2));
+fprintf('submitted %s to cluster %d\n', jobHandle, jobCluster)
 
+% add cluster id to job data structure and save
+job.cluster = jobCluster;
 save([jobDir 'job'], 'job')
 
 

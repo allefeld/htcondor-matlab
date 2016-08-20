@@ -11,6 +11,7 @@ function jobHandle = condorCreateJob
 % Copyright (C) 2016 Carsten Allefeld
 
 
+% get htcondor-matlab job directory from configuration
 conDir = condorConfig('condir');
 
 % find last existing job index (subdirectory of htcondor-matlab job directory)
@@ -24,19 +25,19 @@ if isempty(j), j = 0; end
 jobHandle = sprintf('job%ld', j + 1);
 jobDir = [conDir jobHandle filesep];
 
-% create new job subdirectory
-[s, m] = mkdir(jobDir);
-if s == 0
-    error(m)
-end
-
 % initialize job data structure
 job = struct;
 job.handle = jobHandle;
 job.dir = jobDir;
 job.numTasks = 0;                                                           %#ok<STRNU>
 
-% save data structure to subdirectory
+% create new job subdirectory
+[s, m] = mkdir(jobDir);
+if s == 0
+    error(m)
+end
+
+% save job data structure to job subdirectory
 save([jobDir 'job'], 'job')
 
 

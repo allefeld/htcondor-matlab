@@ -12,99 +12,129 @@ function condorMonitorJob(jobHandle)
 % Copyright (C) 2016 Carsten Allefeld
 
 
+% load job data structure
 jobDir = [condorConfig('condir') jobHandle filesep];
 load([jobDir 'job.mat'], 'job')
 
-ofid = -1 * ones(job.numTasks, 1);
-osh = cell(job.numTasks, 1);
-osh(:) = {'–'};
-osl = cell(job.numTasks, 1);
-osl(:) = {'–'};
-
-efid = -1 * ones(job.numTasks, 1);
-err = repmat(' ', job.numTasks, 1);
-
-lfid = -1 * ones(job.numTasks, 1);
-ls = cell(job.numTasks, 1);
-ls(:) = {'–'};
-
-ids = reshape(sprintf(' %03d | ', job.task.id), 7, [])';
+% for all tasks
+%   initialize file ids to handle
+outFID = -1 * ones(job.numTasks, 1);  % Matlab standard output
+errFID = -1 * ones(job.numTasks, 1);  % Matlab standard error
+logFID = -1 * ones(job.numTasks, 1);  % HTCondor log
+%   initialize current primary and secondary message for monitor
+priMsg = cell(job.numTasks, 1);
+priMsg(:) = {'–'};
+secMsg = cell(job.numTasks, 1);
+secMsg(:) = {'–'};
+%   initialize error indicator for monitor
+errInd = repmat(' ', job.numTasks, 1);
+%   initialize last log message for monitor
+logMsg = cell(job.numTasks, 1);
+logMsg(:) = {'–'};
+% prepare task id for monitor
+taskID = reshape(sprintf(' %03d | ', job.task.id), 7, [])';
+% prepare column separator for monitor
 sep = repmat(' | ', job.numTasks, 1);
 
+% display loop
 while true
     fprintf('\nscanning files')
+    % for each task
     for i = 1 : job.numTasks
         fprintf('.')
         
-        % read out files
-        if ofid(i) == -1
-            ofid(i) = fopen(job.task(i).out, 'r');
+        % scan Matlab standard output
+        % make sure file is opened as soon as it exists
+        if outFID(i) == -1
+            outFID(i) = fopen(job.task(i).out, 'r');
         end
-        if ofid(i) ~= -1
+        if outFID(i) ~= -1
+            % read lines ...
             while true
-                l = fgetl(ofid(i));
-                if ~ischar(l), break, end   % EOF
-                % ignore MATLAB prompt
-                while strncmp(l, '>> ', 3)  
-                    l = l(4 : end);
+                line = fgetl(outFID(i));
+                % ... until current end of file
+                if ~ischar(line)    
+                    break
                 end
-                % deal with backspace characters (SPM!)
-                ind = find(l == char(08), 1, 'last');
+                % ignore MATLAB prompt(s) at beginning of line
+                while strncmp(line, '>> ', 3)  
+                    line = line(4 : end);
+                end
+                % if there are backspace characters,
+                % ignore everything up to the last one in the line
+                % (because SPM uses backspaces to clear the current line)
+                % would be better to interpret the character properly
+                ind = find(line == char(08), 1, 'last');
                 if ~isempty(ind)
-                    l = l(ind + 1 : end);
+                    line = line(ind + 1 : end);
                 end
-                % sort lines into primary and secondary outputs
-                if ~isempty(l)
-                    if isspace(l(1))
-                        % indented -> secondary output
-                        osl{i} = l(2 : end);
+                % determine current primary and secondary message
+                if ~isempty(line)
+                    if ~isspace(line(1))
+                        % not indented -> primary message, clear secondary
+                        priMsg{i} = line;
+                        secMsg{i} = ' ';
                     else
-                        % not indented -> primary output, clear secondary
-                        osh{i} = l;
-                        osl{i} = ' ';
+                        % indented -> secondary message
+                        secMsg{i} = line(2 : end);
                     end
                 end
             end
         end
         
-        % read err files
-        if efid(i) == -1
-            efid(i) = fopen(job.task(i).err, 'r');
+        % scan Matlab standard error
+        % make sure file is opened as soon as it exists
+        if errFID(i) == -1
+            errFID(i) = fopen(job.task(i).err, 'r');
         end
-        if (efid(i) ~= -1)
+        if (errFID(i) ~= -1)
+            % read lines ...
             while true
-                l = fgetl(efid(i));
-                if ~ischar(l), break, end   % EOF
-%                 fprintf('stderr: %s\n', l)
-                if strcmp(l, 'Matlab started')
-                    err(i) = ' ';
-                else
-                    err(i) = '*';
+                line = fgetl(errFID(i));
+                % ... until current end of file
+                if ~ischar(line)
+                    break
+                end
+                % if a line can be read, i.e. file is not empty, indicate error
+                errInd(i) = '*';
+                % but reset indicator when Matlab input script starts
+                % (because there are irrelevant error messages during Matlab startup)
+                if strcmp(line, 'input script started')
+                    % marker written by input script, see condorCreateTask
+                    errInd(i) = ' ';
                 end
             end
         end
         
-        % read log files
-        if lfid(i) == -1
-            lfid(i) = fopen(job.task(i).log, 'r');
+        % scan HTCondor log
+        % make sure file is opened as soon as it exists
+        if logFID(i) == -1
+            logFID(i) = fopen(job.task(i).log, 'r');
         end
-        if lfid(i) ~= -1
+        if logFID(i) ~= -1
+            % read lines ...
             while true
-                l = fgetl(lfid(i));
-                if ~ischar(l), break, end   % EOF
-                if (numel(l) >= 3) && (l(1) ~= '.') && (l(1) ~= char(9))
-                    code = str2double(l(1 : 3));
+                line = fgetl(logFID(i));
+                % ... until current end of file
+                if ~ischar(line)
+                    break
+                end
+                if (numel(line) >= 3) && (line(1) ~= '.') && (line(1) ~= char(9))
+                    code = str2double(line(1 : 3));
                     if code ~= 6            % ignore image resize
-                        ls{i} = l(21 : end);
+                        logMsg{i} = line(21 : end);
                     end
                 end
             end
         end
     end
     
+    % display monitor and pause
+    clc
     fprintf('\n    *** monitoring "%s" on HTCondor cluster %d  ***\n\n', ...
         jobHandle, job.cluster)
-    disp([char(err), ids, char(osh), sep, char(osl), sep, char(ls), sep])
+    disp([char(errInd) taskID char(priMsg) sep char(secMsg) sep char(logMsg) sep])
+    fprintf('\nabort with ctrl-c\n\n')
     pause(1)
 end
 
