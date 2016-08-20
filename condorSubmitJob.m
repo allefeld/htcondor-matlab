@@ -22,13 +22,13 @@ fprintf(sdf, '%s\n', submit{:});
 fprintf(sdf, '\n');
 % tasks
 for i = 1 : job.numTasks
+    % attempt to do it via -r instead of stdin: fprintf(sdf, 'Arguments           = -nodisplay -nojvm -r \\"try, run(\\''%s\\''); catch me, fprintf(2, getReport(me)), end, quit force\\"\n', job.task(i).in);
     fprintf(sdf, 'Input               = %s\n', job.task(i).in);
     fprintf(sdf, 'Output              = %s\n', job.task(i).out);
     fprintf(sdf, 'Error               = %s\n', job.task(i).err);
     fprintf(sdf, 'Log                 = %s\n', job.task(i).log);
     fprintf(sdf, 'Queue\n');
     fprintf(sdf, '\n');
-    
 end
 fclose(sdf);
 

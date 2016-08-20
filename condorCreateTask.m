@@ -45,7 +45,7 @@ save(task.inf, 'condorTask');
 
 % create input script for Matlab process
 fid = fopen(task.in, 'w');
-fprintf(fid, 'fseek(2, 0, ''bof'')\n');
+fprintf(fid, 'fprintf(2, ''\\nMatlab started\\n'');\n');
 fprintf(fid, 'slot = getenv(''_CONDOR_SLOT'');\n');
 fprintf(fid, 'setenv(''LD_LIBRARY_PATH'')\n');
 fprintf(fid, '[~, hostname] = system(''condor_config_val -raw HOSTNAME'');\n');

@@ -44,7 +44,7 @@ while true
             while true
                 l = fgetl(ofid(i));
                 if ~ischar(l), break, end   % EOF
-                % remove MATLAB prompt
+                % ignore MATLAB prompt
                 while strncmp(l, '>> ', 3)  
                     l = l(4 : end);
                 end
@@ -72,17 +72,15 @@ while true
             efid(i) = fopen(job.task(i).err, 'r');
         end
         if (efid(i) ~= -1)
-%             l = fgetl(efid(i));
-%             if ischar(l)
-%                 err(i) = '*';
-%             end
-            % move to end
-            fseek(efid(i), 0, 'eof');
-            % read end position
-            fsize = ftell(efid(i));
-            % HACK to account for strange dbus / hal error messages
-            if fsize > 360
-                err(i) = '*';
+            while true
+                l = fgetl(efid(i));
+                if ~ischar(l), break, end   % EOF
+%                 fprintf('stderr: %s\n', l)
+                if strcmp(l, 'Matlab started')
+                    err(i) = ' ';
+                else
+                    err(i) = '*';
+                end
             end
         end
         
@@ -104,7 +102,6 @@ while true
         end
     end
     
-    clc
     fprintf('\n    *** monitoring "%s" on HTCondor cluster %d  ***\n\n', ...
         jobHandle, job.cluster)
     disp([char(err), ids, char(osh), sep, char(osl), sep, char(ls), sep])
