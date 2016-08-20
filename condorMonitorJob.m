@@ -1,6 +1,6 @@
 function condorMonitorJob(jobHandle)
 
-% monitor progress of running Condor job
+% monitor task progress of a running HTCondor job
 %
 % condorMonitorJob(jobHandle)
 %
@@ -12,7 +12,7 @@ function condorMonitorJob(jobHandle)
 % Copyright (C) 2016 Carsten Allefeld
 
 
-jobDir = [condorConfig('condir') jobHandle '/'];
+jobDir = [condorConfig('condir') jobHandle filesep];
 load([jobDir 'job.mat'], 'job')
 
 ofid = -1 * ones(job.numTasks, 1);
@@ -48,7 +48,7 @@ while true
                 while strncmp(l, '>> ', 3)  
                     l = l(4 : end);
                 end
-                % deal with SPM's 08 = BS characters
+                % deal with backspace characters (SPM!)
                 ind = find(l == char(08), 1, 'last');
                 if ~isempty(ind)
                     l = l(ind + 1 : end);
@@ -77,7 +77,7 @@ while true
 %                 err(i) = '*';
 %             end
             % move to end
-            fseek(efid(i), 0, 1);
+            fseek(efid(i), 0, 'eof');
             % read end position
             fsize = ftell(efid(i));
             % HACK to account for strange dbus / hal error messages
@@ -105,12 +105,11 @@ while true
     end
     
     clc
-    fprintf('\n    *** monitoring "%s" on condor cluster %d  ***\n\n', ...
+    fprintf('\n    *** monitoring "%s" on HTCondor cluster %d  ***\n\n', ...
         jobHandle, job.cluster)
     disp([char(err), ids, char(osh), sep, char(osl), sep, char(ls), sep])
     pause(1)
 end
-
 
 
 % This program is free software: you can redistribute it and/or modify it

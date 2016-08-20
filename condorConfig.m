@@ -19,7 +19,7 @@ function out = condorConfig(name)
 
 % htcondor-matlab job directory
 % point to an existing writable directory that is accessible from all machines
-condir = ['/store02_analysis/' getenv('USER') '/condor/'];
+conDir = ['/store02_analysis/' getenv('USER') '/condor/'];
 
 % entries for the HTCondor submit description file 
 % see http://research.cs.wisc.edu/htcondor/manual/v8.2.3/condor_submit.html
@@ -42,21 +42,21 @@ submit = {'Universe            = vanilla'           % do not change!
 switch name
     case 'condir'
         % check whether condir exists and is writable
-        [success, message] = fileattrib(condir);
+        [success, message] = fileattrib(conDir);
         if ~(success && message.directory)
-            fprintf('htcondor-matlab job directory\n  %s\ndoes not exist\n', condir)
+            fprintf('htcondor-matlab job directory\n  %s\ndoes not exist\n', conDir)
             error('create directory or edit configuration in condorConfig.m!')
         end
         % check whether it's writable
         if ~message.UserWrite
-            error('htcondor-matlab job directory\n  %s\nis not writable!', condir)
+            error('htcondor-matlab job directory\n  %s\nis not writable!', conDir)
         end
         % get absolute name
-        condir = message.Name;
-        if condir(end) ~= filesep
-            condir = [condir filesep];
+        conDir = message.Name;
+        if conDir(end) ~= filesep
+            conDir = [conDir filesep];
         end
-        out = condir;
+        out = conDir;
     case 'submit'
         out = submit;
 end

@@ -1,6 +1,6 @@
 function results = condorGetResults(jobHandle)
 
-% retrieve results of a finished Condor job
+% retrieve results of a finished HTCondor job
 %
 % results = condorGetResults(jobHandle)
 %
@@ -12,7 +12,7 @@ function results = condorGetResults(jobHandle)
 % Copyright (C) 2016 Carsten Allefeld
 
 
-jobDir = [condorConfig('condir') jobHandle '/'];
+jobDir = [condorConfig('condir') jobHandle filesep];
 load([jobDir 'job'], 'job')
 
 results = cell(job.numTasks, 1);

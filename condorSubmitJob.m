@@ -1,6 +1,6 @@
 function condorSubmitJob(jobHandle)
 
-% submit a job to the Condor system
+% submit a job to the HTCondor system
 %
 % condorSubmitJob(jobHandle)
 %
@@ -10,14 +10,15 @@ function condorSubmitJob(jobHandle)
 % Copyright (C) 2016 Carsten Allefeld
 
 
-jobDir = [condorConfig('condir') jobHandle '/'];
+jobDir = [condorConfig('condir') jobHandle filesep];
 load([jobDir 'job'], 'job')
 
 % generate submit description file
 sdfName = [job.dir 'submit'];                                                   %#ok<NODEF>
 sdf = fopen(sdfName, 'w');
 % general job properties
-fprintf(sdf, '%s\n', condorConfig('submit'));
+submit = condorConfig('submit');
+fprintf(sdf, '%s\n', submit{:});
 fprintf(sdf, '\n');
 % tasks
 for i = 1 : job.numTasks
@@ -32,7 +33,7 @@ end
 fclose(sdf);
 
 % submit job via `condor_submit`
-setenv('LD_LIBRARY_PATH')  % avoid problems with libraries for `system`
+setenv('LD_LIBRARY_PATH')  % avoid shared library problems for `system`
 [status, result] = system(['condor_submit ' sdfName]);
 if status ~= 0
     error(result)
