@@ -36,10 +36,7 @@ submit = {'Universe            = vanilla'           % do not change!
          ['Executable          = ' fullfile(matlabroot, 'bin', 'matlab')]
           'Arguments           = -nodisplay -nojvm' % enable Java if necessary
           'Notification        = never'             % if enabled, also define Notify_User
-          % run at most four tasks on one machine
-          'Requirements        = (SlotID <= 4)'     % HACK?  
-          % prefer fast machines
-          'Rank                = Mips'};
+          };
 
 % ---------------------------------------------------------------------
 
