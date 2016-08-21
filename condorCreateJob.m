@@ -4,7 +4,10 @@ function jobHandle = condorCreateJob
 %
 % jobHandle = condorCreateJob
 %
-% jobHandle:    handle of job (string)
+% jobHandle:  handle of created job (string)
+%
+% See also condorCreateTask, condorSubmitJob, condorMonitorJob, condorGetResults
+%
 %
 % This file is part of the development version of htcondor-matlab, see
 % https://github.com/allefeld/htcondor-matlab

@@ -4,7 +4,17 @@ function results = condorGetResults(jobHandle)
 %
 % results = condorGetResults(jobHandle)
 %
-% jobHandle:    handle of job (string)
+% jobHandle:  handle of job
+% results:    cell array of tasks' return values
+%
+% `results` is a cell array with one element per task. If a task is not yet
+% finished, the corresponding element of `results` is an empty array. If a
+% task finished successfully, the corresponding element is a cell array
+% containing the return value(s) of that task. If a task exited with an
+% error, the corresponding element is a cell array that contains an empty
+% array.
+%
+% See also condorCreateJob, condorCreateTask, condorSubmitJob, condorMonitorJob
 %
 %
 % This file is part of the development version of htcondor-matlab, see

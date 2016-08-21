@@ -4,6 +4,10 @@ function condorSubmitJob(jobHandle)
 %
 % condorSubmitJob(jobHandle)
 %
+% jobHandle:  handle of job to be submitted
+%
+% See also condorCreateJob, condorCreateTask, condorMonitorJob, condorGetResults
+%
 %
 % This file is part of the development version of htcondor-matlab, see
 % https://github.com/allefeld/htcondor-matlab

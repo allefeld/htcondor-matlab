@@ -4,10 +4,12 @@ function condorCreateTask(jobHandle, taskFun, argIn, numArgOut)
 %
 % condorCreateTask(jobHandle, taskFun, argIn, numArgOut = 0)
 %
-% jobHandle:    handle of job the task should be added to
-% taskFun:      handle of function that should be run
-% argIn:        cell array of parameters to pass to taskFun
-% numArgOut:    number of outputs of fun that should be saved
+% jobHandle:  handle of job the task should be added to
+% taskFun:    handle of function that should be run
+% argIn:      cell array of parameters to pass to taskFun
+% numArgOut:  number of outputs of taskFun that should be saved
+%
+% See also condorCreateJob, condorSubmitJob, condorMonitorJob, condorGetResults
 %
 %
 % This file is part of the development version of htcondor-matlab, see

@@ -1,6 +1,11 @@
 function out = condorConfig(name)
 
-% define configuration parameters for htcondor-matlab job management
+% retrieve configuration parameters for htcondor-matlab job management
+%
+% out = condorConfig(name)
+%
+% name:  name of configuration parameter
+% out:   corresponding value
 %
 % This function is called by other parts of htcondor-matlab to get
 % configuration parameters. It can be edited by the user to adjust the

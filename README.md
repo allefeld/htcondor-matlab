@@ -40,11 +40,11 @@ This function scans standard output, standard error and HTCondor log files of al
 – The third column shows the last secondary message since the last primary message.  
 – The fourth column shows the last entry from the HTCondor log.
 
-The return values of the tasks in a job are retrieved by:
+After all tasks in a job are finished, their return values are retrieved by:
 
     results = condorGetResults(jobHandle);
 
-`results` is a cell array with one element per task. If a task is not yet finished, the corresponding element of `results` is an empty array. If a task finished successfully, the corresponding element is a cell array containing the return value(s) of that task. If a task exited with an error, the corresponding element is a cell array that contains an empty array.
+`results` is a cell array with one element per task. For each task, the corresponding element is a cell array containing the return value(s) of that task.
 
 Instead of or in addition to returning values, task functions can also write their results to files.
 

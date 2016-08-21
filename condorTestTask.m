@@ -1,6 +1,8 @@
 function y = condorTestTask(x)
 
-% test function to be used as an HTCondor task
+% test function to be used as an HTCondor task, see README
+%
+% y = condorTestTask(x)
 %
 %
 % This file is part of the development version of htcondor-matlab, see

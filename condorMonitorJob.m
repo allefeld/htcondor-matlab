@@ -4,7 +4,9 @@ function condorMonitorJob(jobHandle)
 %
 % condorMonitorJob(jobHandle)
 %
-% jobHandle:    handle of job (string)
+% jobHandle:  handle of job to be monitored
+%
+% See also condorCreateJob, condorCreateTask, condorSubmitJob, condorGetResults
 %
 %
 % This file is part of the development version of htcondor-matlab, see
