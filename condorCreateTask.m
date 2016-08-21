@@ -1,12 +1,12 @@
-function condorCreateTask(jobHandle, fun, argIn, numArgOut)
+function condorCreateTask(jobHandle, taskFun, argIn, numArgOut)
 
 % define a task and add it to an HTCondor job
 %
-% condorCreateTask(jobHandle, fun, argIn, numArgOut = 0)
+% condorCreateTask(jobHandle, taskFun, argIn, numArgOut = 0)
 %
 % jobHandle:    handle of job the task should be added to
-% fun:          handle of function that should be run
-% argIn:        cell array of parameters to pass to fun
+% taskFun:      handle of function that should be run
+% argIn:        cell array of parameters to pass to taskFun
 % numArgOut:    number of outputs of fun that should be saved
 %
 %
@@ -37,7 +37,7 @@ task.log = [task.name '_log'];  % filename for HTCondor log file
 % create task information; used in input script
 condorTask = struct;
 condorTask.id = job.numTasks;
-condorTask.fun = fun;
+condorTask.fun = taskFun;
 condorTask.argIn = argIn;
 condorTask.numArgOut = numArgOut;
 condorTask.path = path;
@@ -48,7 +48,7 @@ save(task.inf, 'condorTask');
 fid = fopen(task.in, 'w');
 %  -> print marker for condorMonitorJob to stderr
 fprintf(fid, 'fprintf(2, ''\\ninput script started\\n'');\n');
-%  -> report HTCondor slot and node, uses `condor_config_val`
+%  -> report HTCondor slot and machine, uses `condor_config_val`
 fprintf(fid, 'slot = getenv(''_CONDOR_SLOT'');\n');
 fprintf(fid, 'setenv(''LD_LIBRARY_PATH'')\n');
 fprintf(fid, '[~, hostname] = system(''condor_config_val -raw HOSTNAME'');\n');
