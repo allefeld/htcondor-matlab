@@ -28,7 +28,7 @@ A task is defined and added to a job by:
 
     condorCreateTask(jobHandle, taskFun, argIn, numArgOut)
 
-`taskFun` is the function handle of the task function; it can reference an m-file, a nested function, or an anonymous function. `argIn` is a cell array containing the arguments to be passed to the task function, and `numArgOut` is the number of its output arguments.
+`taskFun` is the function handle of the task function; it can reference an m-file (including private) as well as an anonymous, local, or nested function. `argIn` is a cell array containing the arguments to be passed to the task function, and `numArgOut` is the number of its output arguments.
 
 After submitting a job, its progress can be monitored using:
 
@@ -40,13 +40,15 @@ This function scans standard output, standard error and HTCondor log files of al
 – The third column shows the last secondary message since the last primary message.  
 – The fourth column shows the last entry from the HTCondor log.
 
-After all tasks in a job are finished, their return values are retrieved by:
+After all tasks in a job are finished, their return values can be retrieved by:
 
     results = condorGetResults(jobHandle);
 
 `results` is a cell array with one element per task. For each task, the corresponding element is a cell array containing the return value(s) of that task.
 
 Instead of or in addition to returning values, task functions can also write their results to files.
+
+See also the Matlab `help` of `condorCreateJob`, `condorCreateTask`, `condorSubmitJob`, `condorMonitorJob`, and `condorGetResults`.
 
 ## Data structure
 
