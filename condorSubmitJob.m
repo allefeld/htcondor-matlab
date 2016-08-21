@@ -15,14 +15,14 @@ function condorSubmitJob(jobHandle)
 
 
 % load job data structure
-jobDir = [condorConfig('condir') jobHandle filesep];
+jobDir = [condorGetConfig('conDir') jobHandle filesep];
 load([jobDir 'job'], 'job')
 
 % generate HTCondor submit description file
 sdfName = [job.dir 'submit'];                                                   %#ok<NODEF>
 sdf = fopen(sdfName, 'w');
 % get general entries from configuration
-submit = condorConfig('submit');
+submit = condorGetConfig('submit');
 % write general entries
 fprintf(sdf, '%s\n', submit{:});
 fprintf(sdf, '\n');

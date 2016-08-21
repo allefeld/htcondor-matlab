@@ -22,7 +22,7 @@ if nargin < 4
 end
 
 % load job data structure
-jobDir = [condorConfig('condir') jobHandle filesep];
+jobDir = [condorGetConfig('conDir') jobHandle filesep];
 load([jobDir 'job'], 'job')
 
 % generate task data structure

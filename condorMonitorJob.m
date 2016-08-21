@@ -15,7 +15,7 @@ function condorMonitorJob(jobHandle)
 
 
 % load job data structure
-jobDir = [condorConfig('condir') jobHandle filesep];
+jobDir = [condorGetConfig('conDir') jobHandle filesep];
 load([jobDir 'job.mat'], 'job')
 
 % for all tasks

@@ -15,7 +15,7 @@ function jobHandle = condorCreateJob
 
 
 % get htcondor-matlab job directory from configuration
-conDir = condorConfig('condir');
+conDir = condorGetConfig('conDir');
 
 % find last existing job index (subdirectory of htcondor-matlab job directory)
 j = dir([conDir 'job*']);

@@ -4,11 +4,11 @@ A set of Matlab functions to interface with the
 [HTCondor](http://research.cs.wisc.edu/htcondor/) high-throughput computing
 software framework, to submit Matlab functions as tasks.
 
-It is assumed that the HTCondor machines [share a filesystem](http://research.cs.wisc.edu/htcondor/manual/v8.2.3/2_5Submitting_Job.html#SECTION00353000000000000000) and that all machines have access to the resources necessary to run the tasks. The functions use the HTCondor commands `condor_submit` and `condor_config_val`.
+It is assumed that the HTCondor machines share a filesystem and that all machines have access to the resources necessary to run the tasks, including an installation of Matlab. The functions use the HTCondor commands `condor_submit` and `condor_config_val`, and have to be run on one of the HTCondor machines.
 
 ## Installation
 
-Put the htcondor-matlab functions into a directory on the Matlab path. Then edit `condorConfig.m` and adjust the value of `conDir` to point to an existing and writable directory, the htcondor-matlab job directory, which has to be accessible from all HTCondor machines.
+Put the htcondor-matlab functions into a directory on the Matlab path. Then edit `condorConfig.m` and adjust the value of `conDir` to point to an existing and writable directory, the htcondor-matlab job directory, which has to be accessible from all HTCondor machines. Alternatively, copy `condorConfig.m` to a directory with higher preference on the path (or the current directory), and edit this copy.
 
 ## Usage
 
@@ -40,7 +40,7 @@ This function scans standard output, standard error and HTCondor log files of al
 – The third column shows the last secondary message since the last primary message.  
 – The fourth column shows the last entry from the HTCondor log.
 
-After all tasks in a job are finished, their return values can be retrieved by:
+After all tasks in a job are finished, their return values can b    e retrieved by:
 
     results = condorGetResults(jobHandle);
 
