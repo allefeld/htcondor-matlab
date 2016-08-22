@@ -1,15 +1,16 @@
-function condorCreateTask(jobHandle, taskFun, argIn, numArgOut)
+function condorCreateTask(clusterHandle, taskFun, argIn, numArgOut)
 
-% define a task and add it to an HTCondor job
+% define a task and add it to an HTCondor cluster
 %
-% condorCreateTask(jobHandle, taskFun, argIn, numArgOut = 0)
+% condorCreateTask(clusterHandle, taskFun, argIn, numArgOut = 0)
 %
-% jobHandle:  handle of job the task should be added to
-% taskFun:    handle of function that should be run
-% argIn:      cell array of parameters to pass to taskFun
-% numArgOut:  number of outputs of taskFun that should be saved
+% clusterHandle:  handle of cluster the task should be added to
+% taskFun:        function handle of the task function
+% argIn:          cell array of parameters to pass to taskFun
+% numArgOut:      number of outputs of taskFun that should be saved
 %
-% See also condorCreateJob, condorSubmitJob, condorMonitorJob, condorGetResults
+% See also condorCreateCluster, condorSubmitCluster, condorMonitorCluster,
+% condorGetResults 
 %
 %
 % This file is part of the development version of htcondor-matlab, see
@@ -21,24 +22,24 @@ if nargin < 4
     numArgOut = 0;
 end
 
-% load job data structure
-jobDir = [condorGetConfig('conDir') jobHandle filesep];
-load([jobDir 'job'], 'job')
+% load cluster data structure
+clusterDir = [condorGetConfig('conDir') clusterHandle filesep];
+load([clusterDir 'cluster.mat'], 'cluster')
 
 % generate task data structure
 task = struct;
-task.id = job.numTasks;                                                     %#ok<NODEF>
-task.name = sprintf('%stask%03d', job.dir, task.id);
-task.in = [task.name '_in.m'];  % Matlab input script
-task.out = [task.name '_out'];  % filename for Matlab standard output
-task.err = [task.name '_err'];  % filename for Matlab standard error
-task.inf = [task.name '_inf'];  % Matlab task information
-task.res = [task.name '_res'];  % filename for Matlab results
-task.log = [task.name '_log'];  % filename for HTCondor log file
+task.id = cluster.numTasks;                                                     %#ok<NODEF>
+task.name = sprintf('%stask%03d', cluster.dir, task.id);
+task.in = [task.name '_in.m'];      % Matlab input script
+task.out = [task.name '_out'];      % filename for Matlab standard output
+task.err = [task.name '_err'];      % filename for Matlab standard error
+task.inf = [task.name '_inf.mat'];  % Matlab task information
+task.res = [task.name '_res.mat'];  % filename for Matlab results
+task.log = [task.name '_log'];      % filename for HTCondor log file
 
 % create task information; used in input script
 condorTask = struct;
-condorTask.id = job.numTasks;
+condorTask.id = cluster.numTasks;
 condorTask.fun = taskFun;
 condorTask.argIn = argIn;
 condorTask.numArgOut = numArgOut;
@@ -48,7 +49,7 @@ save(task.inf, 'condorTask');
 
 % create input script for Matlab process
 fid = fopen(task.in, 'w');
-%  -> print marker for condorMonitorJob to stderr
+%  -> print marker for condorMonitorCluster to stderr
 fprintf(fid, 'fprintf(2, ''\\ninput script started\\n'');\n');
 %  -> report HTCondor slot and machine, uses `condor_config_val`
 fprintf(fid, 'slot = getenv(''_CONDOR_SLOT'');\n');
@@ -67,10 +68,10 @@ fprintf(fid, '[condorResult{:}] = condorTask.fun(condorTask.argIn{:});\n');
 fprintf(fid, 'save(''%s'', ''condorResult'')\n', task.res);
 fclose(fid);
 
-% add task to job data structure and save
-job.numTasks = job.numTasks + 1;
-job.task(job.numTasks) = task;
-save([jobDir 'job'], 'job')
+% add task to cluster data structure and save
+cluster.numTasks = cluster.numTasks + 1;
+cluster.task(cluster.numTasks) = task;
+save([clusterDir 'cluster.mat'], 'cluster')
 
 
 % This program is free software: you can redistribute it and/or modify it

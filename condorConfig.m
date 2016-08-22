@@ -4,8 +4,8 @@
 % edited version in a directory with higher preference on the path, or the
 % local directory of a project.
 %
-% *** At a minimum, the pathname of the htcondor-matlab job directory needs
-% to be set, but review of other parameters is also recommended. ***
+% *** At a minimum, the pathname of the htcondor-matlab cluster directory
+% needs to be set, but review of other parameters is also recommended. ***
 %
 %
 % This file is part of the development version of htcondor-matlab, see
@@ -13,7 +13,7 @@
 % Copyright (C) 2016 Carsten Allefeld
 
 
-%% htcondor-matlab job directory
+%% htcondor-matlab cluster directory
 %   point to an existing writable directory that is accessible from all machines
 conDir = ['/store02_analysis/' getenv('USER') '/condor/'];
 

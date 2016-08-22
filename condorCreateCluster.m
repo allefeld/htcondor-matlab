@@ -1,12 +1,13 @@
-function jobHandle = condorCreateJob
+function clusterHandle = condorCreateCluster
 
-% create data structure and subdirectory to represent an HTCondor job
+% create data structure and subdirectory to represent an HTCondor cluster
 %
-% jobHandle = condorCreateJob
+% clusterHandle = condorCreateCluster
 %
-% jobHandle:  handle of created job (string)
+% clusterHandle:  handle of created cluster (string)
 %
-% See also condorCreateTask, condorSubmitJob, condorMonitorJob, condorGetResults
+% See also condorCreateTask, condorSubmitCluster, condorMonitorCluster,
+% condorGetResults
 %
 %
 % This file is part of the development version of htcondor-matlab, see
@@ -14,34 +15,34 @@ function jobHandle = condorCreateJob
 % Copyright (C) 2016 Carsten Allefeld
 
 
-% get htcondor-matlab job directory from configuration
+% get htcondor-matlab cluster directory from configuration
 conDir = condorGetConfig('conDir');
 
-% find last existing job index (subdirectory of htcondor-matlab job directory)
-j = dir([conDir 'job*']);
+% find last existing cluster index (subdirectory of htcondor-matlab cluster directory)
+j = dir([conDir 'cluster*']);
 j = j([j.isdir]);
 j = cellfun(@(x)(str2double(x(4 : end))), {j.name}, 'UniformOutput', false);
 j = max([j{:}]);
 if isempty(j), j = 0; end
 
-% generate new job handle
-jobHandle = sprintf('job%ld', j + 1);
-jobDir = [conDir jobHandle filesep];
+% generate new cluster handle
+clusterHandle = sprintf('cluster%ld', j + 1);
+clusterDir = [conDir clusterHandle filesep];
 
-% initialize job data structure
-job = struct;
-job.handle = jobHandle;
-job.dir = jobDir;
-job.numTasks = 0;                                                           %#ok<STRNU>
+% initialize cluster data structure
+cluster = struct;
+cluster.handle = clusterHandle;
+cluster.dir = clusterDir;
+cluster.numTasks = 0;                                                           %#ok<STRNU>
 
-% create new job subdirectory
-[s, m] = mkdir(jobDir);
+% create new cluster subdirectory
+[s, m] = mkdir(clusterDir);
 if s == 0
     error(m)
 end
 
-% save job data structure to job subdirectory
-save([jobDir 'job'], 'job')
+% save cluster data structure to cluster subdirectory
+save([clusterDir 'cluster.mat'], 'cluster')
 
 
 % This program is free software: you can redistribute it and/or modify it

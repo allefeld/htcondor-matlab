@@ -1,11 +1,11 @@
-function results = condorGetResults(jobHandle)
+function results = condorGetResults(clusterHandle)
 
-% retrieve results of a finished HTCondor job
+% retrieve results of a finished HTCondor cluster
 %
-% results = condorGetResults(jobHandle)
+% results = condorGetResults(clusterHandle)
 %
-% jobHandle:  handle of job
-% results:    cell array of tasks' return values
+% clusterHandle:  handle of cluster
+% results:        cell array of tasks' return values
 %
 % `results` is a cell array with one element per task. If a task is not yet
 % finished, the corresponding element of `results` is an empty array. If a
@@ -14,7 +14,8 @@ function results = condorGetResults(jobHandle)
 % error, the corresponding element is a cell array that contains an empty
 % array.
 %
-% See also condorCreateJob, condorCreateTask, condorSubmitJob, condorMonitorJob
+% See also condorCreateCluster, condorCreateTask, condorSubmitCluster,
+% condorMonitorCluster
 %
 %
 % This file is part of the development version of htcondor-matlab, see
@@ -22,21 +23,22 @@ function results = condorGetResults(jobHandle)
 % Copyright (C) 2016 Carsten Allefeld
 
 
-% load job data structure
-jobDir = [condorGetConfig('conDir') jobHandle filesep];
-load([jobDir 'job'], 'job')
+% load cluster data structure
+clusterDir = [condorGetConfig('conDir') clusterHandle filesep];
+load([clusterDir 'cluster.mat'], 'cluster')
 
 % initialize cell array of results
-results = cell(job.numTasks, 1);
+results = cell(cluster.numTasks, 1);
 % for each task
-for i = 1 : job.numTasks
+for i = 1 : cluster.numTasks
     % if results are ready
-    if exist([job.task(i).res '.mat'], 'file')
+    if exist(cluster.task(i).res, 'file')
         % load them and save them in task's cell
-        load(job.task(i).res, 'condorResult')
+        load(cluster.task(i).res, 'condorResult')
         results{i} = condorResult;
     else
-        fprintf('no results for %s/task%03d\n', jobHandle, job.task(i).id)
+        fprintf('no results for task%03d / HTCondor JobId %d.%d\n', ...
+            clusterHandle, cluster.id, cluster.task(i).id)
     end
 end
 

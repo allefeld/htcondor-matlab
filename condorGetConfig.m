@@ -1,6 +1,6 @@
 function out = condorGetConfig(name)
 
-% retrieve configuration parameters for htcondor-matlab job management
+% retrieve configuration parameters for htcondor-matlab
 %
 % out = condorGetConfig(name)
 %
@@ -8,11 +8,7 @@ function out = condorGetConfig(name)
 % out:   corresponding value
 %
 % This function is called by other parts of htcondor-matlab to get
-% configuration parameters. It can be edited by the user to adjust the
-% default parameters.
-%
-% *** At a minimum, the pathname of the htcondor-matlab job directory needs to
-% be set, but review of other parameters is also recommended. ***
+% configuration parameters.
 %
 %
 % This file is part of the development version of htcondor-matlab, see
@@ -32,12 +28,12 @@ switch name
         % check whether conDir exists and is writable
         [success, message] = fileattrib(conDir);                            %#ok<NODEF>
         if ~(success && message.directory)
-            fprintf('htcondor-matlab job directory\n  %s\ndoes not exist\n', conDir)
+            fprintf('htcondor-matlab cluster directory\n  %s\ndoes not exist\n', conDir)
             error('create directory or edit configuration in condorConfig.m!')
         end
         % check whether it's writable
         if ~message.UserWrite
-            error('htcondor-matlab job directory\n  %s\nis not writable!', conDir)
+            error('htcondor-matlab cluster directory\n  %s\nis not writable!', conDir)
         end
         % get absolute name
         conDir = message.Name;

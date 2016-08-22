@@ -1,12 +1,13 @@
-function condorSubmitJob(jobHandle)
+function condorSubmitCluster(clusterHandle)
 
-% submit a job to the HTCondor system
+% submit a cluster to the HTCondor system
 %
-% condorSubmitJob(jobHandle)
+% condorSubmitCluster(clusterHandle)
 %
-% jobHandle:  handle of job to be submitted
+% clusterHandle:  handle of cluster to be submitted
 %
-% See also condorCreateJob, condorCreateTask, condorMonitorJob, condorGetResults
+% See also condorCreateCluster, condorCreateTask, condorMonitorCluster,
+% condorGetResults
 %
 %
 % This file is part of the development version of htcondor-matlab, see
@@ -14,12 +15,12 @@ function condorSubmitJob(jobHandle)
 % Copyright (C) 2016 Carsten Allefeld
 
 
-% load job data structure
-jobDir = [condorGetConfig('conDir') jobHandle filesep];
-load([jobDir 'job'], 'job')
+% load cluster data structure
+clusterDir = [condorGetConfig('conDir') clusterHandle filesep];
+load([clusterDir 'cluster.mat'], 'cluster')
 
 % generate HTCondor submit description file
-sdfName = [job.dir 'submit'];                                                   %#ok<NODEF>
+sdfName = [cluster.dir 'submit'];                                                   %#ok<NODEF>
 sdf = fopen(sdfName, 'w');
 % get general entries from configuration
 submit = condorGetConfig('submit');
@@ -27,28 +28,29 @@ submit = condorGetConfig('submit');
 fprintf(sdf, '%s\n', submit{:});
 fprintf(sdf, '\n');
 % write task-specific entries
-for i = 1 : job.numTasks
-    fprintf(sdf, 'Input  = %s\n', job.task(i).in);
-    fprintf(sdf, 'Output = %s\n', job.task(i).out);
-    fprintf(sdf, 'Error  = %s\n', job.task(i).err);
-    fprintf(sdf, 'Log    = %s\n', job.task(i).log);
+for i = 1 : cluster.numTasks
+    fprintf(sdf, 'Input  = %s\n', cluster.task(i).in);
+    fprintf(sdf, 'Output = %s\n', cluster.task(i).out);
+    fprintf(sdf, 'Error  = %s\n', cluster.task(i).err);
+    fprintf(sdf, 'Log    = %s\n', cluster.task(i).log);
     fprintf(sdf, 'Queue\n');
     fprintf(sdf, '\n');
 end
 fclose(sdf);
 
-% submit job via `condor_submit`
+% submit cluster via `condor_submit`
 setenv('LD_LIBRARY_PATH')  % avoid shared library problems for `system`
 [status, result] = system(['condor_submit ' sdfName]);
 if status ~= 0
     error(result)
 end
-jobCluster = str2double(result(find(result == ' ', 1, 'last') + 1 : end - 2));
-fprintf('submitted %s to cluster %d\n', jobHandle, jobCluster)
+clusterId = str2double(result(find(result == ' ', 1, 'last') + 1 : end - 2));
+fprintf('submitted cluster with handle "%s" has HTCondor ClusterId %d\n', ...
+    clusterHandle, clusterId)
 
-% add cluster id to job data structure and save
-job.cluster = jobCluster;
-save([jobDir 'job'], 'job')
+% add ClusterId to cluster data structure and save
+cluster.id = clusterId;
+save([clusterDir 'cluster.mat'], 'cluster')
 
 
 % This program is free software: you can redistribute it and/or modify it
