@@ -6,7 +6,7 @@ function clusterHandle = condorCreateCluster
 %
 % clusterHandle:  handle of created cluster (string)
 %
-% See also condorCreateTask, condorSubmitCluster, condorMonitorCluster,
+% See also condorAddJob, condorSubmitCluster, condorMonitorCluster,
 % condorGetResults
 %
 %
@@ -21,19 +21,19 @@ conDir = condorGetConfig('conDir');
 % find last existing cluster index (subdirectory of htcondor-matlab cluster directory)
 j = dir([conDir 'cluster*']);
 j = j([j.isdir]);
-j = cellfun(@(x)(str2double(x(4 : end))), {j.name}, 'UniformOutput', false);
+j = cellfun(@(x)(str2double(x(8 : end))), {j.name}, 'UniformOutput', false);
 j = max([j{:}]);
 if isempty(j), j = 0; end
 
 % generate new cluster handle
-clusterHandle = sprintf('cluster%ld', j + 1);
+clusterHandle = sprintf('cluster%ld', j + 1);       % why l?
 clusterDir = [conDir clusterHandle filesep];
 
 % initialize cluster data structure
 cluster = struct;
 cluster.handle = clusterHandle;
 cluster.dir = clusterDir;
-cluster.numTasks = 0;                                                           %#ok<STRNU>
+cluster.numJobs = 0;                                                           %#ok<STRNU>
 
 % create new cluster subdirectory
 [s, m] = mkdir(clusterDir);

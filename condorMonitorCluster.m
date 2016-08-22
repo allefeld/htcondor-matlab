@@ -1,12 +1,12 @@
 function condorMonitorCluster(clusterHandle)
 
-% monitor task progress of a running HTCondor cluster
+% monitor job progress of a running HTCondor cluster
 %
 % condorMonitorCluster(clusterHandle)
 %
 % clusterHandle:  handle of cluster to be monitored
 %
-% See also condorCreateCluster, condorCreateTask, condorSubmitCluster,
+% See also condorCreateCluster, condorAddJob, condorSubmitCluster,
 % condorGetResults
 %
 %
@@ -19,37 +19,37 @@ function condorMonitorCluster(clusterHandle)
 clusterDir = [condorGetConfig('conDir') clusterHandle filesep];
 load([clusterDir 'cluster.mat'], 'cluster')
 
-% for all tasks
+% for all jobs
 %   initialize file ids to handle
-outFID = -1 * ones(cluster.numTasks, 1);  % Matlab standard output
-errFID = -1 * ones(cluster.numTasks, 1);  % Matlab standard error
-logFID = -1 * ones(cluster.numTasks, 1);  % HTCondor log
+outFID = -1 * ones(cluster.numJobs, 1);  % Matlab standard output
+errFID = -1 * ones(cluster.numJobs, 1);  % Matlab standard error
+logFID = -1 * ones(cluster.numJobs, 1);  % HTCondor log
 %   initialize current primary and secondary message for monitor
-priMsg = cell(cluster.numTasks, 1);
+priMsg = cell(cluster.numJobs, 1);
 priMsg(:) = {'–'};
-secMsg = cell(cluster.numTasks, 1);
+secMsg = cell(cluster.numJobs, 1);
 secMsg(:) = {'–'};
 %   initialize error indicator for monitor
-errInd = repmat(' ', cluster.numTasks, 1);
+errInd = repmat(' ', cluster.numJobs, 1);
 %   initialize last log message for monitor
-logMsg = cell(cluster.numTasks, 1);
+logMsg = cell(cluster.numJobs, 1);
 logMsg(:) = {'–'};
-% prepare task id for monitor
-taskId = reshape(sprintf(' %03d | ', cluster.task.id), 7, [])';
+% prepare job id for monitor (corresponds to HTCondor's ProcId)
+jobId = reshape(sprintf(' %03d | ', cluster.job.id), 7, [])';
 % prepare column separator for monitor
-sep = repmat(' | ', cluster.numTasks, 1);
+sep = repmat(' | ', cluster.numJobs, 1);
 
 % display loop
 while true
     fprintf('\nscanning files')
-    % for each task
-    for i = 1 : cluster.numTasks
+    % for each job
+    for i = 1 : cluster.numJobs
         fprintf('.')
         
         % scan Matlab standard output
         % make sure file is opened as soon as it exists
         if outFID(i) == -1
-            outFID(i) = fopen(cluster.task(i).out, 'r');
+            outFID(i) = fopen(cluster.job(i).out, 'r');
         end
         if outFID(i) ~= -1
             % read lines ...
@@ -88,7 +88,7 @@ while true
         % scan Matlab standard error
         % make sure file is opened as soon as it exists
         if errFID(i) == -1
-            errFID(i) = fopen(cluster.task(i).err, 'r');
+            errFID(i) = fopen(cluster.job(i).err, 'r');
         end
         if (errFID(i) ~= -1)
             % read lines ...
@@ -103,7 +103,7 @@ while true
                 % but reset indicator when Matlab input script starts
                 % (because there are irrelevant error messages during Matlab startup)
                 if strcmp(line, 'input script started')
-                    % marker written by input script, see condorCreateTask
+                    % marker written by input script, see condorAddJob
                     errInd(i) = ' ';
                 end
             end
@@ -112,7 +112,7 @@ while true
         % scan HTCondor log
         % make sure file is opened as soon as it exists
         if logFID(i) == -1
-            logFID(i) = fopen(cluster.task(i).log, 'r');
+            logFID(i) = fopen(cluster.job(i).log, 'r');
         end
         if logFID(i) ~= -1
             % read lines ...
@@ -136,7 +136,7 @@ while true
     clc
     fprintf('\n    *** monitoring cluster with handle "%s" / HTCondor ClusterId %d  ***\n\n', ...
         clusterHandle, cluster.id)
-    disp([char(errInd) taskId char(priMsg) sep char(secMsg) sep char(logMsg) sep])
+    disp([char(errInd) jobId char(priMsg) sep char(secMsg) sep char(logMsg) sep])
     fprintf('\nabort with ctrl-c\n\n')
     pause(1)
 end

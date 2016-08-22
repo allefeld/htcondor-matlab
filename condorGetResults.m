@@ -1,20 +1,20 @@
 function results = condorGetResults(clusterHandle)
 
-% retrieve results of a finished HTCondor cluster
+% retrieve results of finished jobs of an HTCondor cluster
 %
 % results = condorGetResults(clusterHandle)
 %
 % clusterHandle:  handle of cluster
-% results:        cell array of tasks' return values
+% results:        cell array of jobs' return values
 %
-% `results` is a cell array with one element per task. If a task is not yet
+% `results` is a cell array with one element per job. If a job is not yet
 % finished, the corresponding element of `results` is an empty array. If a
-% task finished successfully, the corresponding element is a cell array
-% containing the return value(s) of that task. If a task exited with an
+% job finished successfully, the corresponding element is a cell array
+% containing the return value(s) of that job. If a job exited with a Matlab
 % error, the corresponding element is a cell array that contains an empty
 % array.
 %
-% See also condorCreateCluster, condorCreateTask, condorSubmitCluster,
+% See also condorCreateCluster, condorAddJob, condorSubmitCluster,
 % condorMonitorCluster
 %
 %
@@ -28,17 +28,17 @@ clusterDir = [condorGetConfig('conDir') clusterHandle filesep];
 load([clusterDir 'cluster.mat'], 'cluster')
 
 % initialize cell array of results
-results = cell(cluster.numTasks, 1);
-% for each task
-for i = 1 : cluster.numTasks
+results = cell(cluster.numJobs, 1);
+% for each job
+for i = 1 : cluster.numJobs
     % if results are ready
-    if exist(cluster.task(i).res, 'file')
-        % load them and save them in task's cell
-        load(cluster.task(i).res, 'condorResult')
+    if exist(cluster.job(i).res, 'file')
+        % load them and save them in job's cell
+        load(cluster.job(i).res, 'condorResult')
         results{i} = condorResult;
     else
-        fprintf('no results for task%03d / HTCondor JobId %d.%d\n', ...
-            clusterHandle, cluster.id, cluster.task(i).id)
+        fprintf('no results for "job%03d" / HTCondor JobId %d.%d\n', ...
+            clusterHandle, cluster.id, cluster.job(i).id)
     end
 end
 

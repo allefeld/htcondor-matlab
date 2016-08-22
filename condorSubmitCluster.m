@@ -6,7 +6,7 @@ function condorSubmitCluster(clusterHandle)
 %
 % clusterHandle:  handle of cluster to be submitted
 %
-% See also condorCreateCluster, condorCreateTask, condorMonitorCluster,
+% See also condorCreateCluster, condorAddJob, condorMonitorCluster,
 % condorGetResults
 %
 %
@@ -27,12 +27,12 @@ submit = condorGetConfig('submit');
 % write general entries
 fprintf(sdf, '%s\n', submit{:});
 fprintf(sdf, '\n');
-% write task-specific entries
-for i = 1 : cluster.numTasks
-    fprintf(sdf, 'Input  = %s\n', cluster.task(i).in);
-    fprintf(sdf, 'Output = %s\n', cluster.task(i).out);
-    fprintf(sdf, 'Error  = %s\n', cluster.task(i).err);
-    fprintf(sdf, 'Log    = %s\n', cluster.task(i).log);
+% write job-specific entries
+for i = 1 : cluster.numJobs
+    fprintf(sdf, 'Input  = %s\n', cluster.job(i).in);
+    fprintf(sdf, 'Output = %s\n', cluster.job(i).out);
+    fprintf(sdf, 'Error  = %s\n', cluster.job(i).err);
+    fprintf(sdf, 'Log    = %s\n', cluster.job(i).log);
     fprintf(sdf, 'Queue\n');
     fprintf(sdf, '\n');
 end

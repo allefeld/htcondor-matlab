@@ -1,8 +1,8 @@
-function y = condorTestTask(x)
+function y = condorTestJob(x)
 
-% test function to be used as an HTCondor task, see README
+% test function to be used as an HTCondor job, see README
 %
-% y = condorTestTask(x)
+% y = condorTestJob(x)
 %
 %
 % This file is part of the development version of htcondor-matlab, see
@@ -10,7 +10,7 @@ function y = condorTestTask(x)
 % Copyright (C) 2016 Carsten Allefeld
 
 % print primary message
-fprintf('condorTestTask\n')
+fprintf('condorTestJob\n')
 
 % print secondary message
 fprintf(' processing\n')
