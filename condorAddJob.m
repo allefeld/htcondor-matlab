@@ -54,7 +54,7 @@ save(job.inf, 'jobInformation');
 fid = fopen(job.in, 'w');
 %  -> print marker for condorMonitorCluster to stderr
 fprintf(fid, 'fprintf(2, ''\\ninput script started\\n'');\n');
-%  -> report HTCondor slot and machine, uses `condor_config_val`
+%  -> report HTCondor slot and machine, uses `_CONDOR_SLOT` and `condor_config_val`
 fprintf(fid, 'slot = getenv(''_CONDOR_SLOT'');\n');
 fprintf(fid, 'setenv(''LD_LIBRARY_PATH'')\n');
 fprintf(fid, '[~, hostname] = system(''condor_config_val -raw HOSTNAME'');\n');
