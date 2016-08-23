@@ -21,7 +21,8 @@ conDir = condorGetConfig('conDir');
 % find last existing cluster index (subdirectory of htcondor-matlab cluster directory)
 j = dir([conDir 'cluster*']);
 j = j([j.isdir]);
-j = cellfun(@(x)(str2double(x(8 : end))), {j.name}, 'UniformOutput', false);
+j = cellfun(@(x)(str2double(x(numel('cluster') + 1 : end))), {j.name}, ...
+    'UniformOutput', false);
 j = max([j{:}]);
 if isempty(j), j = 0; end
 
