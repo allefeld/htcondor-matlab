@@ -19,6 +19,12 @@ function condorMonitorCluster(clusterHandle)
 clusterDir = [condorGetConfig('conDir') clusterHandle filesep];
 load([clusterDir 'cluster.mat'], 'cluster')
 
+% already submitted?
+if ~isfield(cluster, 'id')
+    error('Cluster with handle "%s" has not yet been submitted to HTCondor!', ...
+        clusterHandle)
+end
+
 % for all jobs
 %   initialize file ids to handle
 outFID = -1 * ones(cluster.numJobs, 1);  % Matlab standard output

@@ -27,7 +27,7 @@ j = max([j{:}]);
 if isempty(j), j = 0; end
 
 % generate new cluster handle
-clusterHandle = sprintf('cluster%ld', j + 1);       % why l?
+clusterHandle = sprintf('cluster%ld', j + 1);       % do we need "l"??
 clusterDir = [conDir clusterHandle filesep];
 
 % initialize cluster data structure

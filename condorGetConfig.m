@@ -28,8 +28,8 @@ switch name
         % check whether conDir exists and is writable
         [success, message] = fileattrib(conDir);                            %#ok<NODEF>
         if ~(success && message.directory)
-            fprintf('htcondor-matlab cluster directory\n  %s\ndoes not exist\n', conDir)
-            error('create directory or edit configuration in condorConfig.m!')
+            error(['htcondor-matlab cluster directory\n  %s\ndoes not exist.\n' ...
+                'create directory or edit configuration in condorConfig.m!'], conDir)
         end
         % check whether it's writable
         if ~message.UserWrite

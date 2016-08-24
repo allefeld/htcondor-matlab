@@ -27,6 +27,12 @@ function results = condorGetResults(clusterHandle)
 clusterDir = [condorGetConfig('conDir') clusterHandle filesep];
 load([clusterDir 'cluster.mat'], 'cluster')
 
+% already submitted?
+if ~isfield(cluster, 'id')
+    error('cluster with handle "%s" has not yet been submitted to HTCondor!', ...
+        clusterHandle)
+end
+
 % initialize cell array of results
 results = cell(cluster.numJobs, 1);
 % for each job

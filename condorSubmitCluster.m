@@ -19,8 +19,13 @@ function condorSubmitCluster(clusterHandle)
 clusterDir = [condorGetConfig('conDir') clusterHandle filesep];
 load([clusterDir 'cluster.mat'], 'cluster')
 
+% any jobs?
+if cluster.numJobs == 0                                                     %#ok<NODEF>
+    error('cluster does not have any jobs!')
+end
+
 % generate HTCondor submit description file
-sdfName = [cluster.dir 'submit'];                                                   %#ok<NODEF>
+sdfName = [cluster.dir 'submit'];
 sdf = fopen(sdfName, 'w');
 % get general entries from configuration
 submit = condorGetConfig('submit');
@@ -42,7 +47,8 @@ fclose(sdf);
 setenv('LD_LIBRARY_PATH')  % avoid shared library problems for `system`
 [status, result] = system(['condor_submit ' sdfName]);
 if status ~= 0
-    error(result)
+    error(['could not call `condor_submit`:\n  %s\n' ...
+        'condorSubmitCluster has to be run on an HTCondor machine!\n'], result)
 end
 clusterId = str2double(result(find(result == ' ', 1, 'last') + 1 : end - 2));
 fprintf('submitted cluster with handle "%s" has HTCondor ClusterId %d\n', ...

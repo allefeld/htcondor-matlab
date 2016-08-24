@@ -2,12 +2,13 @@ function condorAddJob(clusterHandle, jobFun, argIn, numArgOut)
 
 % define a job and add it to an HTCondor cluster
 %
-% condorAddJob(clusterHandle, jobFun, argIn, numArgOut = 0)
+% condorAddJob(clusterHandle, jobFun, argIn = {}, numArgOut)
 %
 % clusterHandle:  handle of cluster the job should be added to
 % jobFun:         function handle of the job function
-% argIn:          cell array of parameters to pass to jobFun
-% numArgOut:      number of outputs of jobFun that should be saved
+% argIn:          cell array of input arguments for jobFun, may be {}
+% numArgOut:      number of output arguments of jobFun to be captured
+%                 guessed if not specified
 %
 % See also condorCreateCluster, condorSubmitCluster, condorMonitorCluster,
 % condorGetResults 
@@ -17,14 +18,32 @@ function condorAddJob(clusterHandle, jobFun, argIn, numArgOut)
 % https://github.com/allefeld/htcondor-matlab
 % Copyright (C) 2016 Carsten Allefeld
 
-
+if nargin < 3
+    argIn = {};
+end
 if nargin < 4
-    numArgOut = 0;
+    numArgOut = abs(nargout(jobFun));   % negative value indicates varargout
+    fprintf('number of output arguments guessed to be %d\n', numArgOut)
+end
+
+% check number of input arguments
+if (nargin(jobFun) >= 0) && (numel(argIn) > nargin(jobFun))
+    error('too many input arguments!')
+end
+% check number of output arguments
+if (nargout(jobFun) ~= 0) && (numArgOut == 0)
+    error('jobFun has at least one output, must be captured!')
 end
 
 % load cluster data structure
 clusterDir = [condorGetConfig('conDir') clusterHandle filesep];
 load([clusterDir 'cluster.mat'], 'cluster')
+
+% already submitted?
+if isfield(cluster, 'id')                                                   %#ok<NODEF>
+    error('cluster with handle "%s" has already been submitted to HTCondor!', ...
+        clusterHandle)
+end
 
 % generate job data structure
 job = struct;
@@ -32,7 +51,7 @@ job = struct;
 % within a cluster; therefore job.id corresponds to HTCondor's ProcId. In
 % HTCondor, a job is uniquely identified by ClusterId.ProcId, where the
 % first part is captured by condorSubmitCluster and stored as cluster.id.
-job.id = cluster.numJobs;                                                     %#ok<NODEF>
+job.id = cluster.numJobs;
 job.basename = sprintf('%sjob%03d', cluster.dir, job.id);
 job.in = [job.basename '_in.m'];      % Matlab input script
 job.out = [job.basename '_out'];      % filename for Matlab standard output

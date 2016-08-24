@@ -22,9 +22,9 @@ pause(10)   % act as if it's taking a while
 % simulate error
 if isprime(x)
     % print secondary message
-    fprintf(' throwing error\n')
+    fprintf(' %g is a prime, throwing error\n', x)
     % generate error
-    error('bad things happen')
+    error('prime number!')
 end
 
 % print secondary message
