@@ -19,15 +19,15 @@ function clusterHandle = condorCreateCluster
 conDir = condorGetConfig('conDir');
 
 % find last existing cluster index (subdirectory of htcondor-matlab cluster directory)
-j = dir([conDir 'cluster*']);
-j = j([j.isdir]);
-j = cellfun(@(x)(str2double(x(numel('cluster') + 1 : end))), {j.name}, ...
+listing = dir([conDir 'cluster*']);
+listing = listing([listing.isdir]);
+ind = cellfun(@(x)(str2double(x(numel('cluster') + 1 : end))), {listing.name}, ...
     'UniformOutput', false);
-j = max([j{:}]);
-if isempty(j), j = 0; end
+ind = max([ind{:}]);
+if isempty(ind), ind = 0; end
 
 % generate new cluster handle
-clusterHandle = sprintf('cluster%ld', j + 1);       % do we need "l"??
+clusterHandle = sprintf('cluster%ld', ind + 1);       % do we need "l"??
 clusterDir = [conDir clusterHandle filesep];
 
 % initialize cluster data structure
@@ -44,6 +44,12 @@ end
 
 % save cluster data structure to cluster subdirectory
 save([clusterDir 'cluster.mat'], 'cluster')
+
+% check whether there are old cluster subdirectories
+if now - min([listing.datenum]) > 30
+    warning('consider deleting old cluster subdirectories in\n  %s\n', conDir)
+end
+
 
 
 % This program is free software: you can redistribute it and/or modify it

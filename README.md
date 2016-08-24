@@ -35,7 +35,7 @@ number as argument and returns its square; unless the number is a prime, in
 which case an error is thrown.
 
 `clusterHandle` is a string of the form `cluster#` where `#` is a sequential
-number starting from 1. The handle is assigned to a cluster by:
+number starting from 0. The handle is assigned to a cluster by:
 
     clusterHandle = condorCreateCluster
 
