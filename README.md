@@ -80,7 +80,7 @@ an asterisk, `*`.
 – The second column shows the last primary message.  
 – The third column shows the last secondary message since the last primary
 message.  
-– The fourth column shows the last entry from the HTCondor log.
+– The fourth column shows the last entry from the HTCondor log (excluding ‘image resize’ messages).
 
 The information is presented as text in the Command Window, or the terminal
 window if Matlab is used without GUI. This has the advantage that
@@ -136,6 +136,6 @@ the standard error, and `job###_log` the HTCondor log.
 
 This software was developed with Matlab R2013a and [HTCondor
 8.2.3](http://research.cs.wisc.edu/htcondor/manual/v8.2.3/index.html) on
-Debian 7.8, but may work with other versions, too. It is copyrighted © 2016 by
-Carsten Allefeld and released under the terms of the GNU General Public
-License, version 3 or later.
+Debian 7.8, but may work with other versions and OSs, too. It is copyrighted
+© 2016 by Carsten Allefeld and released under the terms of the GNU General
+Public License, version 3 or later.
