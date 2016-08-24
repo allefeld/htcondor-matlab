@@ -72,12 +72,13 @@ save(job.inf, 'jobInformation');
 % create input script for Matlab process
 fid = fopen(job.in, 'w');
 %  -> print marker for condorMonitorCluster to stderr
-fprintf(fid, 'fprintf(2, ''\\ninput script started\\n'');\n');
+fprintf(fid, 'fprintf(2, ''\\n***********************\\n'');\n');
 %  -> report HTCondor slot and machine, uses `_CONDOR_SLOT` and `condor_config_val`
 fprintf(fid, 'slot = getenv(''_CONDOR_SLOT'');\n');
 fprintf(fid, 'setenv(''LD_LIBRARY_PATH'')\n');
-fprintf(fid, '[~, hostname] = system(''condor_config_val -raw HOSTNAME'');\n');
-fprintf(fid, 'fprintf([''HTCondor job executing on '' slot ''@'' hostname])\n');
+fprintf(fid, '[status, hostname] = system(''condor_config_val -raw HOSTNAME'');\n');
+fprintf(fid, 'if status ~= 0, hostname = ''localhost\\n''; end\n');
+fprintf(fid, 'fprintf([''job executing on '' slot ''@'' hostname])\n');
 %  -> prepare to run job
 fprintf(fid, 'clear\n');
 fprintf(fid, 'load(''%s'')\n', job.inf);

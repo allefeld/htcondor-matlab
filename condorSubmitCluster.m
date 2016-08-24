@@ -1,10 +1,14 @@
-function condorSubmitCluster(clusterHandle)
+function condorSubmitCluster(clusterHandle, mode)
 
 % submit a cluster to the HTCondor system
 %
 % condorSubmitCluster(clusterHandle)
+% condorSubmitCluster(clusterHandle, 'debug')
 %
 % clusterHandle:  handle of cluster to be submitted
+%
+% If 'debug' is specified as a second argument, jobs are not submitted to
+% condor but executed locally and sequentially.
 %
 % See also condorCreateCluster, condorAddJob, condorMonitorCluster,
 % condorGetResults
@@ -15,12 +19,22 @@ function condorSubmitCluster(clusterHandle)
 % Copyright (C) 2016 Carsten Allefeld
 
 
+if nargin < 2
+    mode = 'submit';
+end
+
 % load cluster data structure
 clusterDir = [condorGetConfig('conDir') clusterHandle filesep];
 load([clusterDir 'cluster.mat'], 'cluster')
 
+% already submitted?
+if isfield(cluster, 'id')                                                   %#ok<NODEF>
+    error('cluster with handle "%s" has already been submitted to HTCondor!', ...
+        clusterHandle)
+end
+
 % any jobs?
-if cluster.numJobs == 0                                                     %#ok<NODEF>
+if cluster.numJobs == 0
     error('cluster does not have any jobs!')
 end
 
@@ -43,20 +57,45 @@ for i = 1 : cluster.numJobs
 end
 fclose(sdf);
 
-% submit cluster via `condor_submit`
-setenv('LD_LIBRARY_PATH')  % avoid shared library problems for `system`
-[status, result] = system(['condor_submit ' sdfName]);
-if status ~= 0
-    error(['could not call `condor_submit`:\n  %s\n' ...
-        'condorSubmitCluster has to be run on an HTCondor machine!\n'], result)
+switch mode
+    case 'submit'
+        % submit cluster via `condor_submit`
+        setenv('LD_LIBRARY_PATH')  % avoid shared library problems for `system`
+        [status, result] = system(['condor_submit ' sdfName]);
+        if status ~= 0
+            error(['could not call `condor_submit`:\n  %s\n' ...
+                'condorSubmitCluster has to be run on an HTCondor machine!\n'], result)
+        end
+        clusterId = str2double(result(find(result == ' ', 1, 'last') + 1 : end - 2));
+        fprintf('submitted cluster with handle "%s" has HTCondor ClusterId %d\n', ...
+            clusterHandle, clusterId)
+        % add ClusterId to cluster data structure and save
+        cluster.id = clusterId;
+        save([clusterDir 'cluster.mat'], 'cluster')
+    case 'debug'
+        % executing jobs locally and sequentially
+        fprintf('condorSubmitCluster DEBUG MODE\n\n')
+        setenv('_CONDOR_SLOT', 'debug')     % needed by input script
+        for i = 1 : cluster.numJobs
+            runContained(cluster.job(i).in) % execute input script
+        end
+        setenv('_CONDOR_SLOT')
+    otherwise
+        error('unknown mode "%s"!', mode)
 end
-clusterId = str2double(result(find(result == ' ', 1, 'last') + 1 : end - 2));
-fprintf('submitted cluster with handle "%s" has HTCondor ClusterId %d\n', ...
-    clusterHandle, clusterId)
 
-% add ClusterId to cluster data structure and save
-cluster.id = clusterId;
-save([clusterDir 'cluster.mat'], 'cluster')
+
+function runContained(scriptname)
+% wrapper around `run`, to contain script execution in separate workspace
+% and catch errors
+try
+    run(scriptname)
+catch ME
+    fprintf('*** job aborted with error:\n')
+    fprintf(2, '%s\n', getReport(ME));
+end
+
+
 
 
 % This program is free software: you can redistribute it and/or modify it

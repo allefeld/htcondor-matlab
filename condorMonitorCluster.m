@@ -110,7 +110,7 @@ while true
                 errInd(i) = '*';
                 % but reset indicator when Matlab input script starts
                 % (because there are irrelevant error messages during Matlab startup)
-                if strcmp(line, 'input script started')
+                if strcmp(line, '***********************')
                     % marker written by input script, see condorAddJob
                     errInd(i) = ' ';
                 end

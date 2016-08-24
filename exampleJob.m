@@ -15,17 +15,17 @@ fprintf('exampleJob\n')
 % print secondary message
 fprintf(' processing\n')
 
-% compute result
-y = x ^ 2;
-pause(10)   % act as if it's taking a while
-
 % simulate error
 if isprime(x)
     % print secondary message
     fprintf(' %g is a prime, throwing error\n', x)
     % generate error
-    error('prime number!')
+    error('argument is a prime number!')
 end
+
+% compute result
+y = x ^ 2;
+pause(10)   % act as if it's taking a while
 
 % print secondary message
 fprintf(' finished\n')
