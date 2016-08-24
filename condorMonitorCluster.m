@@ -27,9 +27,11 @@ end
 
 % for all jobs
 %   initialize file ids to handle
-outFID = -1 * ones(cluster.numJobs, 1);  % Matlab standard output
-errFID = -1 * ones(cluster.numJobs, 1);  % Matlab standard error
-logFID = -1 * ones(cluster.numJobs, 1);  % HTCondor log
+outFID = -1 * ones(cluster.numJobs, 1);     % Matlab standard output
+errFID = -1 * ones(cluster.numJobs, 1);     % Matlab standard error
+logFID = -1 * ones(cluster.numJobs, 1);     % HTCondor log
+% because we never get around to closing these files properly
+cleanupObj = onCleanup(@() fclose('all'));
 %   initialize current primary and secondary message for monitor
 priMsg = cell(cluster.numJobs, 1);
 priMsg(:) = {'–'};
