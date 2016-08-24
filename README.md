@@ -24,13 +24,13 @@ The code for creating and submitting a cluster of jobs has the following form:
 
     clusterHandle = condorCreateCluster;
     for i = 1 : 10
-       condorAddJob(clusterHandle, @condorTestJob, {i}, 1)
+       condorAddJob(clusterHandle, @exampleJob, {i}, 1)
     end
     condorSubmitCluster(clusterHandle)
 
 In this example, the resulting cluster consists of 10 jobs, where each job
-runs `condorTestJob(i)` with values of `i` from 1 to 10. The job function used
-here is included as `condorTestJob.m` with *htcondor-matlab*. It takes a
+runs `exampleJob(i)` with values of `i` from 1 to 10. The job function used
+here is included as `exampleJob.m` with *htcondor-matlab*. It takes a
 number as argument and returns its square; unless the number is a prime, in
 which case an error is thrown.
 
