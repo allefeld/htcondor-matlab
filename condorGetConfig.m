@@ -17,7 +17,11 @@ function out = condorGetConfig(name)
 
 
 % run configuration script
-condorConfig
+try
+    condorConfig
+catch
+    error('htcondor-matlab is not configured.\nsee README and condorConfig_template.m', [])      %#ok<CTPCT>
+end
 
 % return configuration parameter (after some error checking)
 if ~exist(name, 'var')

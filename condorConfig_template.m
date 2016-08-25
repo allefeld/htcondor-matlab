@@ -1,11 +1,10 @@
-% htcondor-matlab configuration parameters
+% TEMPLATE for htcondor-matlab configuration parameters
 %
-% Edit this file to adapt htcondor-matlab to your local system, or put an
-% edited version in a directory with higher preference on the path, or the
-% local directory of a project.
+% Copy this file to condorConfig.m in the same folder
+% and edit it to adapt htcondor-matlab to your local system.
 %
-% *** At a minimum, the pathname of the htcondor-matlab cluster directory
-% needs to be set, but review of other parameters is also recommended. ***
+% At a minimum, the pathname of the htcondor-matlab cluster directory
+% needs to be set, but review of other parameters is also recommended.
 %
 %
 % This file is part of the development version of htcondor-matlab, see

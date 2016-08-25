@@ -12,11 +12,10 @@ to be run on one of the HTCondor machines.
 ## Installation
 
 Put the *htcondor-matlab* functions into a directory on the Matlab path. Then
-edit `condorConfig.m` and adjust the value of `conDir` to point to an existing
-and writable directory, the *htcondor-matlab* cluster directory, which has to
-be accessible from all HTCondor machines. Alternatively, copy `condorConfig.m`
-to a directory with higher preference on the path (or the current directory),
-and edit this copy.
+copy `condorConfig_template.m` to `condorConfig.m` in the same directory and
+edit the copy. At a minimum, adjust the value of `conDir` to point to an
+existing and writable directory, the *htcondor-matlab* cluster directory,
+which has to be accessible from all HTCondor machines.
 
 ## Usage
 
@@ -30,9 +29,9 @@ The code for creating and submitting a cluster of jobs has the following form:
 
 In this example, the resulting cluster consists of 10 jobs, where each job
 runs `exampleJob(i)` with values of `i` from 1 to 10. The job function used
-here is included as `exampleJob.m` with *htcondor-matlab*. It takes a
-number as argument and returns its square; unless the number is a prime, in
-which case an error is thrown.
+here is included as `exampleJob.m` with *htcondor-matlab*. It takes a number
+as argument and returns its square; unless the number is a prime, in which
+case an error is thrown.
 
 `clusterHandle` is a string of the form `cluster#` where `#` is a sequential
 number starting from 0. The handle is assigned to a cluster by:
@@ -80,7 +79,8 @@ an asterisk, `*`.
 – The second column shows the last primary message.  
 – The third column shows the last secondary message since the last primary
 message.  
-– The fourth column shows the last entry from the HTCondor log (excluding ‘image resize’ messages).
+– The fourth column shows the last entry from the HTCondor log (excluding
+‘image resize’ messages).
 
 The information is presented as text in the Command Window, or the terminal
 window if Matlab is used without GUI. This has the advantage that
@@ -136,6 +136,6 @@ the standard error, and `job###_log` the HTCondor log.
 
 This software was developed with Matlab R2013a and [HTCondor
 8.2.3](http://research.cs.wisc.edu/htcondor/manual/v8.2.3/index.html) on
-Debian 7.8, but may work with other versions and OSs, too. It is copyrighted
-© 2016 by Carsten Allefeld and released under the terms of the GNU General
+Debian 7.8, but may work with other versions and OSs, too. It is copyrighted ©
+2016 by Carsten Allefeld and released under the terms of the GNU General
 Public License, version 3 or later.
