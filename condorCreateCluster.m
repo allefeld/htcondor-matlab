@@ -47,9 +47,8 @@ save([clusterDir 'cluster.mat'], 'cluster')
 
 % check whether there are old cluster subdirectories
 if now - min([listing.datenum]) > 30
-    warning('consider deleting old cluster subdirectories in\n  %s\n', conDir)
+    fprintf(2, 'consider deleting old cluster subdirectories in\n  %s\n', conDir)
 end
-
 
 
 % This program is free software: you can redistribute it and/or modify it

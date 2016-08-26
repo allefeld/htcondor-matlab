@@ -49,7 +49,7 @@ sep = repmat(' | ', cluster.numJobs, 1);
 
 % display loop
 while true
-    fprintf('\nscanning files')
+    fprintf('\nscanning files, please wait')
     % for each job
     for i = 1 : cluster.numJobs
         fprintf('.')

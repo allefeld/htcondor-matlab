@@ -1,4 +1,4 @@
-function condorAddJob(clusterHandle, jobFun, argIn, numArgOut)
+    function condorAddJob(clusterHandle, jobFun, argIn, numArgOut)
 
 % define a job and add it to an HTCondor cluster
 %
@@ -17,6 +17,7 @@ function condorAddJob(clusterHandle, jobFun, argIn, numArgOut)
 % This file is part of the development version of htcondor-matlab, see
 % https://github.com/allefeld/htcondor-matlab
 % Copyright (C) 2016 Carsten Allefeld
+
 
 if nargin < 3
     argIn = {};

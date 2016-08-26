@@ -87,7 +87,7 @@ end
 
 function runContained(scriptname)
 % wrapper around `run`, to contain script execution in separate workspace
-% and catch errors
+% and catch errors (for debug mode)
 try
     run(scriptname)
 catch ME
