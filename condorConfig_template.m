@@ -18,12 +18,26 @@ conDir = ['/store02_analysis/' getenv('USER') '/condor/'];
 
 
 %% general entries for the HTCondor submit description file 
-%   see http://research.cs.wisc.edu/htcondor/manual/v8.2.3/condor_submit.html
-%   and http://research.cs.wisc.edu/htcondor/manual/v8.2.3/12_Appendix_A.html
-submit = {'Universe            = vanilla'           % do not change!
-          'Transfer_Executable = false'             % do not change!
-          'Kill_Sig            = 2'                 % do not change!
-          % location and parameters of Matlab executable
-         ['Executable          = ' fullfile(matlabroot, 'bin', 'matlab')]
-          'Arguments           = -nodisplay -nojvm' % enable Java if necessary
-          };
+% for possible entries, see
+%   http://research.cs.wisc.edu/htcondor/manual/v8.2.3/condor_submit.html
+submit = {
+    % do not change!
+    'Universe              = vanilla'           % necessary for Matlab
+    'Transfer_Executable   = false'             % local/shared installation is assumed
+    % trying to prevent / deal with killing & holding, not sure whether this works
+    'Kill_Sig              = 2'                 % SIGINT, make kill graceful
+    'Want_Graceful_Removal = True'              % make kill graceful
+    'Job_Max_Vacate_Time   = 2600000'           % postpone kill
+    % notification; it may be necessary to set Notify_User to your email address
+    'Notification = Complete'                   % get email when the job terminates
+    % location and parameters of Matlab executable
+    ['Executable           = ' fullfile(matlabroot, 'bin', 'matlab')]
+    'Arguments             = -nodisplay -nojvm' % enable Java if necessary
+    };
+% Apart from this submit configuration, policy configuration is also
+% important. Since Matlab jobs cannot be checkpointed, preemption of a job
+% (eviction, vacating, killing) means that it has to start over from the
+% beginning. Since HTCondor 8.1.5, preemption is disabled by the default
+% configuration, but for earlier versions or if a previous configuration
+% was kept, ask your HTCondor administrator to use the configuration at
+% http://research.cs.wisc.edu/htcondor/manual/v8.1.4/3_5Policy_Configuration.html#SECTION00459500000000000000
