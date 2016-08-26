@@ -96,8 +96,8 @@ corresponding element is a cell array containing the return value(s) of that
 job. Instead of or in addition to returning values, job functions can of
 course also write their results directly to files.
 
-See also the Matlab `help` of `condorCreateCluster`, `condorAddJob`,
-`condorSubmitCluster`, `condorMonitorCluster`, and `condorGetResults`.
+For additional details, see the Matlab `help` of `condorCreateCluster` and
+`condorGetResults`.
 
 ## Clusters, jobs, IDs, and handles
 
@@ -126,11 +126,16 @@ to manage and run the cluster as well as the return values of completed jobs.
 To save disk space, it is advisable to delete a subdirectory after the
 corresponding cluster is finished and its return values are no longer needed.
 
-Within each cluster subdirectory, the cluster’s HTcondor submit description
-file is `submit`. Job-specific data are in files whose name begins with
-`job###`, where `###` is the job ID, a number starting from 000. In
-particular, `job###_out` contains the standard output of the job, `job###_err`
-the standard error, and `job###_log` the HTCondor log.
+Within each cluster subdirectory, general cluster and job management data are
+kept in `cluster.mat`. After submission, the cluster’s HTcondor submit
+description file is `submit`. Job-specific data are in files whose name begins
+with `job###`, where `###` is the job ID, a number starting from 000. On
+submission, the file `job###_in.m` containing the job’s Matlab input script
+and the file `job###_inf.mat` with job information used by that script are
+created. The job’s *standard output* is redirected to the file `job###_out` and
+its *standard error* to `job###_err`. HTCondor *log messages* are written to
+`job###_log`. When finished, the return values of the job are written to
+`job###_res.mat`.
 
 ------------------------------------------------------------------------------
 
