@@ -87,7 +87,9 @@ fprintf(fid, 'path(jobInformation.path)\n');
 fprintf(fid, 'cd(jobInformation.wd)\n');
 %  -> run job and capture results
 fprintf(fid, 'condorResult = cell(1, jobInformation.numArgOut);\n');
-fprintf(fid, '[condorResult{:}] = jobInformation.fun(jobInformation.argIn{:});\n');
+fprintf(fid, 'try\n');
+fprintf(fid, '    [condorResult{:}] = jobInformation.fun(jobInformation.argIn{:});\n');
+fprintf(fid, 'catch ME, fprintf(2, ''%%s\\n'', getReport(ME)); exit(1), end\n');
 %  -> save results
 fprintf(fid, 'save(''%s'', ''condorResult'')\n', job.res);
 fclose(fid);

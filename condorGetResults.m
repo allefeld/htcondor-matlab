@@ -11,8 +11,7 @@ function results = condorGetResults(clusterHandle)
 % finished, the corresponding element of `results` is an empty array. If a
 % job finished successfully, the corresponding element is a cell array
 % containing the return value(s) of that job. If a job exited with a Matlab
-% error, the corresponding element is a cell array that contains an empty
-% array.
+% error, the corresponding element is an empty array.
 %
 % See also condorCreateCluster, condorAddJob, condorSubmitCluster,
 % condorMonitorCluster
@@ -44,7 +43,7 @@ for i = 1 : cluster.numJobs
         results{i} = condorResult;
     else
         fprintf('no results for "job%03d" / HTCondor JobId %d.%d\n', ...
-            clusterHandle, cluster.id, cluster.job(i).id)
+            cluster.job(i).id, cluster.id, cluster.job(i).id)
     end
 end
 

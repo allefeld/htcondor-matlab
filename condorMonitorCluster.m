@@ -146,9 +146,16 @@ while true
         clusterHandle, cluster.id)
     disp([char(errInd) jobId char(priMsg) sep char(secMsg) sep char(logMsg) sep])
     fprintf('\nabort with ctrl-c\n\n')
+%     system(sprintf('condor_q %d -af JobStatus', cluster.id));
     pause(1)
 end
 
+% JobStatus http://research.cs.wisc.edu/htcondor/manual/v8.5/12_Appendix_A.html#103498
+% 1: Idle         if requirements can not (yet) fulfilled
+% 2: Running
+% 3: Removed      not shown if aborted via condor_rm
+% 4: Completed    never shown
+% 5: Held         no idea how to induce
 
 % This program is free software: you can redistribute it and/or modify it
 % under the terms of the GNU General Public License as published by the
