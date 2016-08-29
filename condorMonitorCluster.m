@@ -19,32 +19,37 @@ function condorMonitorCluster(clusterHandle)
 clusterDir = [condorGetConfig('conDir') clusterHandle filesep];
 load([clusterDir 'cluster.mat'], 'cluster')
 
-% already submitted?
-if ~isfield(cluster, 'id')
-    error('Cluster with handle "%s" has not yet been submitted to HTCondor!', ...
-        clusterHandle)
-end
-
-% for all jobs
-%   initialize file ids to handle
+% initialize file identifiers
 outFID = -1 * ones(cluster.numJobs, 1);     % Matlab standard output
 errFID = -1 * ones(cluster.numJobs, 1);     % Matlab standard error
 logFID = -1 * ones(cluster.numJobs, 1);     % HTCondor log
 % because we never get around to closing these files properly
 cleanupObj = onCleanup(@() fclose('all'));
-%   initialize current primary and secondary message for monitor
+
+% prepare job number
+jobNumber = strsplit(sprintf('job%03d\n', 0 : cluster.numJobs - 1));
+jobNumber = jobNumber(1 : end - 1)';
+% initialize error indicator
+errInd = repmat(' ', cluster.numJobs, 1);
+% initialize current primary and secondary message
 priMsg = cell(cluster.numJobs, 1);
 priMsg(:) = {'–'};
 secMsg = cell(cluster.numJobs, 1);
 secMsg(:) = {'–'};
-%   initialize error indicator for monitor
-errInd = repmat(' ', cluster.numJobs, 1);
-%   initialize last log message for monitor
+% prepare HTCondor's ClusterId.ProcId
+jobId = cell(cluster.numJobs, 1);
+for i = 1 : cluster.numJobs
+    if isfield(cluster.job(i), 'clusterId')
+        jobId{i} = sprintf('%d.%d', ...
+            cluster.job(i).clusterId, cluster.job(i).procId);
+    else
+        jobId{i} = '–';
+    end
+end
+% initialize last log message
 logMsg = cell(cluster.numJobs, 1);
 logMsg(:) = {'–'};
-% prepare job id for monitor (corresponds to HTCondor's ProcId)
-jobId = reshape(sprintf(' %03d | ', cluster.job.id), 7, [])';
-% prepare column separator for monitor
+% prepare column separator
 sep = repmat(' | ', cluster.numJobs, 1);
 
 % display loop
@@ -142,11 +147,11 @@ while true
     
     % display monitor and pause
     clc
-    fprintf('\n    *** monitoring cluster with handle "%s" / HTCondor ClusterId %d  ***\n\n', ...
-        clusterHandle, cluster.id)
-    disp([char(errInd) jobId char(priMsg) sep char(secMsg) sep char(logMsg) sep])
+    fprintf('\n                *** monitoring %s  ***\n\n', clusterHandle)
+    disp([char(jobNumber) sep char(priMsg) sep char(secMsg) sep char(errInd) ...
+        sep char(jobId) sep char(logMsg)])
     fprintf('\nabort with ctrl-c\n\n')
-%     system(sprintf('condor_q %d -af JobStatus', cluster.id));
+%     system(sprintf('condor_q %d -af JobStatus', cluster.clusterId));
     pause(1)
 end
 

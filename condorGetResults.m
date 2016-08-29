@@ -27,8 +27,8 @@ clusterDir = [condorGetConfig('conDir') clusterHandle filesep];
 load([clusterDir 'cluster.mat'], 'cluster')
 
 % already submitted?
-if ~isfield(cluster, 'id')
-    error('cluster with handle "%s" has not yet been submitted to HTCondor!', ...
+if isempty(cluster.clusterIds)
+    error('%s has not yet been submitted to HTCondor!', ...
         clusterHandle)
 end
 
@@ -42,8 +42,8 @@ for i = 1 : cluster.numJobs
         load(cluster.job(i).res, 'condorResult')
         results{i} = condorResult;
     else
-        fprintf('no results for "job%03d" / HTCondor JobId %d.%d\n', ...
-            cluster.job(i).id, cluster.id, cluster.job(i).id)
+        fprintf(2, 'no results for "job%03d" / HTCondor job %d.%d\n', ...
+            i - 1, cluster.job(i).clusterId, cluster.job(i).procId);
     end
 end
 

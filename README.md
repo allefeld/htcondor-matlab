@@ -74,13 +74,16 @@ about larger processing units in the job can be separated from information
 that tracks progress within these units, giving a more fine-grained overview.
 The output of `condorMonitorCluster` has tabular form with the following
 structure:  
-– The first column shows the job ID. Jobs with error messages are marked with
-an asterisk, `*`.  
+– The first column shows the job number `###`, starting from 000.  
 – The second column shows the last primary message.  
 – The third column shows the last secondary message since the last primary
 message.  
-– The fourth column shows the last entry from the HTCondor log (excluding
-‘image resize’ messages).
+– In the fourth column, jobs with error messages are marked with an asterisk,
+`*`.  
+– The fifth column shows the HTCondor job identifier in the form
+ClusterId.ProcId.  
+– The sixth column shows the last entry from the HTCondor log, excluding
+‘image resize’ messages.
 
 The information is presented as text in the Command Window, or the terminal
 window if Matlab is used without GUI. This has the advantage that
@@ -99,20 +102,20 @@ course also write their results directly to files.
 For additional details, see the Matlab `help` of `condorCreateCluster` and
 `condorGetResults`.
 
-## Clusters, jobs, IDs, and handles
+## Clusters, jobs, handles, and IDs
 
 *htcondor-matlab* adopts the terminology of HTCondor: A single computation
-unit is called a ‘job’, and a group of jobs submitted together is called a
-‘cluster’. In HTCondor, a job is also called a ‘process’ after submission, and
-it is identified by a label of the form ClusterId.ProcId. Cluster IDs are
-integers assigned by HTCondor sequentially on submission, and process IDs are
-integers assigned to jobs in the order of the submit description file,
-starting from 0 within a cluster.
+unit is called a ‘job’, and a group of jobs belonging together is called a
+‘cluster’. In HTCondor, a job is also called a ‘process’ after submission.
+Cluster IDs are integers assigned by HTCondor sequentially on submission, and
+process IDs are integers assigned to jobs in the order of the submit
+description file, starting from 0 within a cluster.
 
-For technical reasons, the `clusterHandle` assigned by *htcondor-matlab* does
-not correspond to HTCondor’s cluster ID, but `condorSubmitCluster` and
-`condorMonitorCluster` provide information about HTCondor cluster and process
-IDs, so that its tools including
+For technical reasons, the `clusterHandle` assigned by *htcondor-matlab* is
+not identical to HTCondor’s ClusterId, and the job number assigned by
+*htcondor-matlab* can differ from HTCondor’s ProcId. However,
+`condorMonitorCluster` lists for each job the corresponding identifier of the
+form ClusterId.ProcId used by HTCondor, so that its tools including
 [`condor_q`](http://research.cs.wisc.edu/htcondor/manual/v8.2.3/condor_q.html)
 and
 [`condor_rm`](http://research.cs.wisc.edu/htcondor/manual/v8.2.3/condor_rm.html)
@@ -129,11 +132,11 @@ corresponding cluster is finished and its return values are no longer needed.
 Within each cluster subdirectory, general cluster and job management data are
 kept in `cluster.mat`. After submission, the cluster’s HTcondor submit
 description file is `submit`. Job-specific data are in files whose name begins
-with `job###`, where `###` is the job ID, a number starting from 000. On
-submission, the file `job###_in.m` containing the job’s Matlab input script
-and the file `job###_inf.mat` with job information used by that script are
-created. The job’s *standard output* is redirected to the file `job###_out` and
-its *standard error* to `job###_err`. HTCondor *log messages* are written to
+with `job###`, where `###` is the job number. On submission, the file
+`job###_in.m` containing the job’s Matlab input script and the file
+`job###_inf.mat` with job information used by that script are created. The
+job’s *standard output* is redirected to the file `job###_out` and its
+*standard error* to `job###_err`. HTCondor *log messages* are written to
 `job###_log`. When finished, the return values of the job are written to
 `job###_res.mat`.
 

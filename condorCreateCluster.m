@@ -32,9 +32,9 @@ clusterDir = [conDir clusterHandle filesep];
 
 % initialize cluster data structure
 cluster = struct;
-cluster.handle = clusterHandle;
 cluster.dir = clusterDir;
-cluster.numJobs = 0;                                                           %#ok<STRNU>
+cluster.numJobs = 0;
+cluster.clusterIds = [];                                                        %#ok<STRNU>
 
 % create new cluster subdirectory
 [s, m] = mkdir(clusterDir);
@@ -44,10 +44,11 @@ end
 
 % save cluster data structure to cluster subdirectory
 save([clusterDir 'cluster.mat'], 'cluster')
+fprintf('created %s\n', clusterHandle)
 
 % check whether there are old cluster subdirectories
 if now - min([listing.datenum]) > 30
-    fprintf(2, 'consider deleting old cluster subdirectories in\n  %s\n', conDir)
+    fprintf(2, 'consider deleting old cluster subdirectories in\n  %s\n', conDir);
 end
 
 

@@ -28,12 +28,13 @@ clusterDir = [condorGetConfig('conDir') clusterHandle filesep];
 load([clusterDir 'cluster.mat'], 'cluster')
 
 % already submitted?
-if isfield(cluster, 'id')                                                   %#ok<NODEF>
-    error('cluster with handle "%s" has already been submitted to HTCondor!', ...
+if ~isempty(cluster.clusterIds)                                                 %#ok<NODEF>
+    error('%s has already been submitted to HTCondor!', ...
         clusterHandle)
+    % --> resubmit. warning that debug and resubmit don't go together
 end
 
-% any jobs?
+% are there jobs?
 if cluster.numJobs == 0
     error('cluster does not have any jobs!')
 end
@@ -67,10 +68,14 @@ switch mode
                 'condorSubmitCluster has to be run on an HTCondor machine!\n'], result)
         end
         clusterId = str2double(result(find(result == ' ', 1, 'last') + 1 : end - 2));
-        fprintf('submitted cluster with handle "%s" has HTCondor ClusterId %d\n', ...
+        fprintf('submitted %s to HTCondor as %d\n', ...
             clusterHandle, clusterId)
-        % add ClusterId to cluster data structure and save
-        cluster.id = clusterId;
+        % add ClusterId and ProcId to cluster data structure and save
+        cluster.clusterIds = [cluster.clusterIds clusterId];
+        for i = 1 : cluster.numJobs
+            cluster.job(i).clusterId = clusterId;
+            cluster.job(i).procId = i - 1;  % analogous to HTCondor
+        end
         save([clusterDir 'cluster.mat'], 'cluster')
     case 'debug'
         % executing jobs locally and sequentially

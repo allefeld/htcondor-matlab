@@ -41,19 +41,14 @@ clusterDir = [condorGetConfig('conDir') clusterHandle filesep];
 load([clusterDir 'cluster.mat'], 'cluster')
 
 % already submitted?
-if isfield(cluster, 'id')                                                   %#ok<NODEF>
-    error('cluster with handle "%s" has already been submitted to HTCondor!', ...
+if ~isempty(cluster.clusterIds)                                                 %#ok<NODEF>
+    error('%s has already been submitted to HTCondor!', ...
         clusterHandle)
 end
 
 % generate job data structure
 job = struct;
-% job ids are assigned here in the same way HTCondor does for processes
-% within a cluster; therefore job.id corresponds to HTCondor's ProcId. In
-% HTCondor, a job is uniquely identified by ClusterId.ProcId, where the
-% first part is captured by condorSubmitCluster and stored as cluster.id.
-job.id = cluster.numJobs;
-job.basename = sprintf('%sjob%03d', cluster.dir, job.id);
+job.basename = sprintf('%sjob%03d', cluster.dir, cluster.numJobs);
 job.in = [job.basename '_in.m'];      % Matlab input script
 job.out = [job.basename '_out'];      % filename for Matlab standard output
 job.err = [job.basename '_err'];      % filename for Matlab standard error
@@ -98,6 +93,7 @@ fclose(fid);
 cluster.numJobs = cluster.numJobs + 1;
 cluster.job(cluster.numJobs) = job;
 save([clusterDir 'cluster.mat'], 'cluster')
+fprintf('added job %03d to %s\n', cluster.numJobs, clusterHandle)
 
 
 % This program is free software: you can redistribute it and/or modify it
