@@ -37,7 +37,7 @@ if (nargout(jobFun) ~= 0) && (numArgOut == 0)
 end
 
 % load cluster data structure
-clusterDir = [condorGetConfig('conDir') clusterHandle filesep];
+clusterDir = [condor_get_config('conDir') clusterHandle filesep];
 load([clusterDir 'cluster.mat'], 'cluster')
 
 % already submitted?

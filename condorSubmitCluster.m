@@ -24,7 +24,7 @@ if nargin < 2
 end
 
 % load cluster data structure
-clusterDir = [condorGetConfig('conDir') clusterHandle filesep];
+clusterDir = [condor_get_config('conDir') clusterHandle filesep];
 load([clusterDir 'cluster.mat'], 'cluster')
 
 % already submitted?
@@ -43,7 +43,7 @@ end
 sdfName = [cluster.dir 'submit'];
 sdf = fopen(sdfName, 'w');
 % get general entries from configuration
-submit = condorGetConfig('submit');
+submit = condor_get_config('submit');
 % write general entries
 fprintf(sdf, '%s\n', submit{:});
 fprintf(sdf, '\n');

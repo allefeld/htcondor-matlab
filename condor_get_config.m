@@ -1,19 +1,18 @@
-function out = condorGetConfig(name)
+function out = condor_get_config(name)
 
-% retrieve configuration parameters for htcondor-matlab
-%
-% out = condorGetConfig(name)
-%
-% name:  name of configuration parameter
-% out:   corresponding value
-%
-% This function is called by other parts of htcondor-matlab to get
-% configuration parameters.
+% internal helper function
 %
 %
 % This file is part of the development version of htcondor-matlab, see
 % https://github.com/allefeld/htcondor-matlab
 % Copyright (C) 2016 Carsten Allefeld
+
+% retrieve configuration parameters for htcondor-matlab
+%
+% out = condor_get_config(name)
+%
+% name:  name of configuration parameter
+% out:   corresponding value
 
 
 % run configuration script

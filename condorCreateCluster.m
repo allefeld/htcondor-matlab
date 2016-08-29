@@ -16,7 +16,7 @@ function clusterHandle = condorCreateCluster
 
 
 % get htcondor-matlab cluster directory from configuration
-conDir = condorGetConfig('conDir');
+conDir = condor_get_config('conDir');
 
 % find last existing cluster index (subdirectory of htcondor-matlab cluster directory)
 listing = dir([conDir 'cluster*']);
