@@ -72,18 +72,22 @@ That is, a line with no leading whitespace is considered a ‘primary message’
 a line with leading whitespace a ‘secondary message’. This way, information
 about larger processing units in the job can be separated from information
 that tracks progress within these units, giving a more fine-grained overview.
+
 The output of `condorMonitorCluster` has tabular form with the following
 structure:  
-– The first column shows the job number `###`, starting from 000.  
-– The second column shows the last primary message.  
-– The third column shows the last secondary message since the last primary
+– The 1st column shows the job number `###`, starting from 000.  
+– The 2nd column shows the last primary message.  
+– The 3rd column shows the last secondary message since the last primary
 message.  
-– In the fourth column, jobs with error messages are marked with an asterisk,
-`*`.  
-– The fifth column shows the HTCondor job identifier in the form
+– In the 4th column, jobs that have Matlab error messages are marked with ‘∗’.
+Jobs which exited successfully are marked with ‘+’, which exited with an error
+are marked with ‘-’, and which crashed are marked with ‘\~’. Additionally the
+HTCondor job status is indicated by one of the letters ‘I’ = idle, ‘R’ =
+running, ‘X’ = removed, ‘C’ = completed, or ‘H’ = on hold.  
+– The 5th column shows the HTCondor job identifier in the form
 ClusterId.ProcId.  
-– The sixth column shows the last entry from the HTCondor log, excluding
-‘image resize’ messages.
+– The 6th column shows the last event from the HTCondor log (excluding ‘image
+size updated’)
 
 The information is presented as text in the Command Window, or the terminal
 window if Matlab is used without GUI. This has the advantage that

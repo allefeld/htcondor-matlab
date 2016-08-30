@@ -64,8 +64,8 @@ switch mode
         setenv('LD_LIBRARY_PATH')  % avoid shared library problems for `system`
         [status, result] = system(['condor_submit ' sdfName]);
         if status ~= 0
-            error(['could not call `condor_submit`:\n  %s\n' ...
-                'condorSubmitCluster has to be run on an HTCondor machine!\n'], result)
+            fprintf(2, 'condorSubmitCluster has to be run on an HTCondor machine!\n');
+            error('error calling `condor_submit`:\n  %s\n', result)
         end
         clusterId = str2double(result(find(result == ' ', 1, 'last') + 1 : end - 2));
         fprintf('submitted %s to HTCondor as %d\n', ...

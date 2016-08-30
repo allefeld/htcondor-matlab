@@ -1,6 +1,6 @@
 function condorMonitorCluster(clusterHandle)
 
-% monitor job progress of a running HTCondor cluster
+% monitor job progress of an HTCondor cluster
 %
 % condorMonitorCluster(clusterHandle)
 %
@@ -51,6 +51,9 @@ logMsg = cell(cluster.numJobs, 1);
 logMsg(:) = {'–'};
 % prepare column separator
 sep = repmat(' | ', cluster.numJobs, 1);
+% prepare symbols for job status
+statusSymbols = 'IRXCH>S';
+
 
 % display loop
 while true
@@ -123,6 +126,7 @@ while true
         end
         
         % scan HTCondor log
+        % see http://research.cs.wisc.edu/htcondor/manual/v8.2.3/2_6Managing_Job.html#SECTION00367000000000000000
         % make sure file is opened as soon as it exists
         if logFID(i) == -1
             logFID(i) = fopen(cluster.job(i).log, 'r');
@@ -137,30 +141,37 @@ while true
                 end
                 if (numel(line) >= 3) && (line(1) ~= '.') && (line(1) ~= char(9))
                     code = str2double(line(1 : 3));
-                    if code ~= 6            % ignore image resize
+                    if code ~= 6    % "Image size of job updated" -> ignore
                         logMsg{i} = line(21 : end);
+                    end
+                    if code == 5    % "Job terminated" -> append termination description
+                        line = fgetl(logFID(i));
+                        if ischar(line)
+                            logMsg{i} = [logMsg{i} ' ' line(6 : end)];
+                        end
                     end
                 end
             end
         end
     end
     
+    % additional information from `condor_q`
+    [jobStatus, exitCode, exitSignal] = condor_job_status(clusterHandle);
+    statusInd = statusSymbols(jobStatus)';
+    exitInd = repmat(' ', cluster.numJobs, 1);
+    exitInd(exitCode == 0) = '+';       % exited successfully
+    exitInd(exitCode > 0) = '-';        % exited with error
+    exitInd(~isnan(exitSignal)) = '~';  % terminated by signal (crashed)
+    
     % display monitor and pause
     clc
-    fprintf('\n                *** monitoring %s  ***\n\n', clusterHandle)
-    disp([char(jobNumber) sep char(priMsg) sep char(secMsg) sep char(errInd) ...
-        sep char(jobId) sep char(logMsg)])
+    fprintf('\n                *** monitoring %s ***\n\n', clusterHandle)
+    disp([char(jobNumber) sep char(priMsg) sep char(secMsg) sep ...
+        errInd exitInd statusInd sep char(jobId) sep char(logMsg)])
     fprintf('\nabort with ctrl-c\n\n')
-%     system(sprintf('condor_q %d -af JobStatus', cluster.clusterId));
     pause(1)
 end
 
-% JobStatus http://research.cs.wisc.edu/htcondor/manual/v8.5/12_Appendix_A.html#103498
-% 1: Idle         if requirements can not (yet) fulfilled
-% 2: Running
-% 3: Removed      not shown if aborted via condor_rm
-% 4: Completed    never shown
-% 5: Held         no idea how to induce
 
 % This program is free software: you can redistribute it and/or modify it
 % under the terms of the GNU General Public License as published by the

@@ -1,4 +1,4 @@
-function y = exampleJob(x)
+function j = exampleJob(i)
 
 % example job function
 %
@@ -13,22 +13,22 @@ function y = exampleJob(x)
 fprintf('exampleJob\n')
 
 % print secondary message
-fprintf(' processing\n')
+fprintf(' processing %d\n', i)
 
 % simulate error
-if isprime(x)
+if isprime(i)
     % print secondary message
-    fprintf(' %g is a prime, throwing error\n', x)
+    fprintf(' %g is a prime, throwing error\n', i)
     % generate error
     error('argument is a prime number!')
 end
 
 % compute result
-y = x ^ 2;
+j = i ^ 2;
 pause(10)   % act as if it's taking a while
 
 % print secondary message
-fprintf(' finished\n')
+fprintf(' returning %d\n', j)
 
 
 % This program is free software: you can redistribute it and/or modify it

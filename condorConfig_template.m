@@ -23,15 +23,12 @@ conDir = ['/store02_analysis/' getenv('USER') '/condor/'];
 submit = {
     % do not change!
     'Universe              = vanilla'           % necessary for Matlab
-    'Transfer_Executable   = false'             % local/shared installation is assumed
-    % trying to prevent / deal with killing & holding, not sure whether this works
-    'Kill_Sig              = 2'                 % SIGINT, make kill graceful
-    'Want_Graceful_Removal = True'              % make kill graceful
-    'Job_Max_Vacate_Time   = 2600000'           % postpone kill
+    'Transfer_Executable   = False'             % local/shared installation is assumed
+    'Want_Graceful_Removal = False'             % make removal immediate
     % notification; it may be necessary to set Notify_User to your email address
-    'Notification = Complete'                   % get email when the job terminates
+    'Notification          = Complete'          % get email when the job terminates
     % location and parameters of Matlab executable
-    ['Executable           = ' fullfile(matlabroot, 'bin', 'matlab')]
+   ['Executable            = ' fullfile(matlabroot, 'bin', 'matlab')]
     'Arguments             = -nodisplay -nojvm' % enable Java if necessary
     };
 % Apart from this submit configuration, policy configuration is also
