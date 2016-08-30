@@ -9,6 +9,7 @@ machines have access to the resources necessary to run the jobs, including an
 installation of Matlab. The functions use HTCondor commands and have therefore
 to be run on one of the HTCondor machines.
 
+
 ## Installation
 
 Put the *htcondor-matlab* functions into a directory on the Matlab path. Then
@@ -16,6 +17,7 @@ copy `condorConfig_template.m` to `condorConfig.m` in the same directory and
 edit the copy. At a minimum, adjust the value of `conDir` to point to an
 existing and writable directory, the *htcondor-matlab* cluster directory,
 which has to be accessible from all HTCondor machines.
+
 
 ## Usage
 
@@ -34,13 +36,13 @@ as argument and returns its square; unless the number is a prime, in which
 case an error is thrown.
 
 `clusterHandle` is a string of the form `cluster#` where `#` is a sequential
-number starting from 0. The handle is assigned to a cluster by:
+number starting from 0. The handle is assigned when the __cluster is created__:
 
     clusterHandle = condorCreateCluster
 
 It is used to identify the cluster to all other functions.
 
-A job is defined and added to a cluster by:
+A __job is defined__ and added to a cluster by:
 
     condorAddJob(clusterHandle, jobFun, argIn, numArgOut)
 
@@ -49,11 +51,11 @@ m-file (including private) as well as an anonymous, local, or nested function.
 `argIn` is a cell array containing the arguments to be passed to the job
 function, and `numArgOut` is the number of its output arguments.
 
-A cluster of jobs is submitted to HTCondor using:
+A cluster of jobs is __submitted__ to HTCondor using:
 
     condorSubmitCluster(clusterHandle)
 
-After submission, the progress of its jobs can be monitored using:
+After submission, the progress of its jobs can be __monitored__ using:
 
     condorMonitorCluster(clusterHandle)
 
@@ -81,7 +83,7 @@ structure:
 message.  
 – In the 4th column, jobs that have Matlab error messages are marked with ‘∗’.
 Jobs which exited successfully are marked with ‘+’, which exited with an error
-are marked with ‘-’, and which crashed are marked with ‘\~’. Additionally the
+are marked with ‘-’, and which crashed are marked with ‘~’. Additionally the
 HTCondor job status is indicated by one of the letters ‘I’ = idle, ‘R’ =
 running, ‘X’ = removed, ‘C’ = completed, or ‘H’ = on hold.  
 – The 5th column shows the HTCondor job identifier in the form
@@ -93,18 +95,16 @@ The information is presented as text in the Command Window, or the terminal
 window if Matlab is used without GUI. This has the advantage that
 `condorMonitorCluster` can also be used under an `ssh` login.
 
-After all jobs in a cluster have finished, their return values can be
-retrieved by:
+The __return values__ of the jobs in a cluster can be retrieved by:
 
     results = condorGetResults(clusterHandle);
 
-`results` is a cell array with one element per job. For each job, the
-corresponding element is a cell array containing the return value(s) of that
-job. Instead of or in addition to returning values, job functions can of
+`results` is a cell array with one element per job. If a job exited
+successfully, the corresponding element is a cell array containing the return
+value(s) of that job. If a job is not (yet) completed, the element is an empty
+array. Instead of or in addition to returning values, job functions can of
 course also write their results directly to files.
 
-For additional details, see the Matlab `help` of `condorCreateCluster` and
-`condorGetResults`.
 
 ## Clusters, jobs, handles, and IDs
 
@@ -125,6 +125,7 @@ and
 [`condor_rm`](http://research.cs.wisc.edu/htcondor/manual/v8.2.3/condor_rm.html)
 can be easily used in conjunction.
 
+
 ## Internal data structure
 
 In the *htcondor-matlab* cluster directory, for each cluster a subdirectory is
@@ -144,7 +145,9 @@ job’s *standard output* is redirected to the file `job###_out` and its
 `job###_log`. When finished, the return values of the job are written to
 `job###_res.mat`.
 
+
 ------------------------------------------------------------------------------
+
 
 This software was developed with Matlab R2013a and [HTCondor
 8.2.3](http://research.cs.wisc.edu/htcondor/manual/v8.2.3/index.html) on
