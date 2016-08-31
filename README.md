@@ -111,6 +111,13 @@ value(s) of that job. If a job is not (yet) completed, the element is an empty
 array. Instead of or in addition to returning values, job functions can of
 course also write their results directly to files.
 
+A __list__ of all existing clusters, including summary statistics about their
+jobs’ status, can be obtained by
+
+    condorClusters
+
+It uses the same symbols as `condorMonitorCluster`, see above.
+
 
 ## Clusters, jobs, handles, and IDs
 
