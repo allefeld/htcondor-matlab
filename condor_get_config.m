@@ -44,6 +44,8 @@ switch name
             conDir = [conDir filesep];
         end
         out = conDir;
+    case 'oldTime'
+        out = oldTime;
     case 'submit'
         out = submit;
 end

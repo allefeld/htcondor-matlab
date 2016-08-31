@@ -116,7 +116,8 @@ jobs’ status, can be obtained by
 
     condorClusters
 
-It uses the same symbols as `condorMonitorCluster`, see above.
+It uses the same symbols as `condorMonitorCluster`, see above. Old clusters can
+be removed using `condorClusters clean`.
 
 
 ## Clusters, jobs, handles, and IDs
@@ -142,10 +143,10 @@ can be easily used in conjunction.
 ## Internal data structure
 
 In the *htcondor-matlab* cluster directory, for each cluster a subdirectory is
-created with a name identical to its handle, `cluster#`, which contains data
-to manage and run the cluster as well as the return values of completed jobs.
-To save disk space, it is advisable to delete a subdirectory after the
-corresponding cluster is finished and its return values are no longer needed.
+created with a name identical to its handle, `cluster#`, which contains data to
+manage and run the cluster as well as the return values of completed jobs.  To
+save disk space, it is advisable to remove old clusters from time to time, see
+above.
 
 Within each cluster subdirectory, general cluster and job management data are
 kept in `cluster.mat`. After submission, the cluster’s HTcondor submit

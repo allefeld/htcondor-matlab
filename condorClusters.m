@@ -1,14 +1,19 @@
-function condorClusters
+function condorClusters(mode)
 
 % list all existing clusters and their job properties
 %
 % condorClusters
+% condorClusters('clean')
 %
 %
 % This file is part of the development version of htcondor-matlab, see
 % https://github.com/allefeld/htcondor-matlab
 % Copyright (C) 2016 Carsten Allefeld
 
+
+if nargin == 0
+    mode = '';
+end
 
 % get htcondor-matlab cluster directory from configuration
 conDir = condor_get_config('conDir');
@@ -21,6 +26,7 @@ number = cellfun(@(x)(str2double(x(numel('cluster') + 1 : end))), ...
     {listing(:).name}, 'UniformOutput', false);
 [number, ind] = sort([number{:}]);
 listing = listing(ind);
+nClusters = numel(listing);
 
 % get symbols for job status and exit status
 [statusSymbols, exitSymbols] = condor_job_status;
@@ -30,7 +36,8 @@ fprintf('cluster  ')
 fprintf('%4c', statusSymbols)
 fprintf('%4c', exitSymbols)
 fprintf('   description\n')
-for i = 1 : numel(listing)
+removable = false(nClusters, 1);
+for i = 1 : nClusters
     fprintf('%7d  ', number(i))
     try
         % load cluster data structure
@@ -47,10 +54,43 @@ for i = 1 : numel(listing)
         fprintf('%4d', nStatus)
         fprintf('%4d', nExitSuccess, nExitError, nExitSignal)
         fprintf('   %s\n', cluster.description)
+        % removable: if there are no jobs in queue
+        removable(i) = ~any(ismember(jobStatus, [1 2 3 5 6 7]));
     catch
         fprintf('– data corrupted –\n')
+        % removable: corrupted clusters always
+        removable(i) = true;
     end
 end
+fprintf('\n')
+
+% cleaning
+old = (now - [listing(:).datenum]' > condor_get_config('oldTime'));
+toremove = (old & removable);
+if strcmp(mode, 'clean')
+    fprintf('of %d old cluster subdirectories, %d can be removed\n\n', ...
+        sum(old), sum(toremove))
+    if sum(toremove) > 0
+        fprintf('removing cluster subdirectories in\n  %s\n', conDir)
+        for i = find(toremove)'
+            [status, message] = rmdir([conDir listing(i).name], 's');
+            if status == 1
+                fprintf('%s\n', listing(i).name)
+            else
+                fprintf(2, '%s: %s\n', listing(i).name, message);
+            end
+        end
+    end
+else
+    if sum(toremove) > 0
+        fprintf('of %d old cluster subdirectories, %d can be removed:\n', ...
+            sum(old), sum(toremove))
+        fprintf(' %d', number(toremove))
+        fprintf('\n')
+        fprintf(2, 'consider calling `condorClusters clean`\n');
+    end
+end
+
 
 % This program is free software: you can redistribute it and/or modify it
 % under the terms of the GNU General Public License as published by the

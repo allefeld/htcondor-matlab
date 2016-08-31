@@ -57,8 +57,9 @@ save([clusterDir 'cluster.mat'], 'cluster')
 fprintf('created %s\n', clusterHandle)
 
 % check whether there are old cluster subdirectories
-if now - min([listing.datenum]) > 30
-    fprintf(2, 'consider deleting old cluster subdirectories in\n  %s\n', conDir);
+if now - min([listing(:).datenum]) > condor_get_config('oldTime')
+    fprintf(2, '\nconsider removing old cluster subdirectories\n');
+    fprintf(2, 'for an overview, call `condorClusters`\n');
 end
 
 

@@ -17,6 +17,10 @@
 conDir = ['/store02_analysis/' getenv('USER') '/condor/'];
 
 
+%% time after which clusters are considered "old", in days
+oldTime = 30;
+
+
 %% general entries for the HTCondor submit description file 
 % for possible entries, see
 %   http://research.cs.wisc.edu/htcondor/manual/v8.2.3/condor_submit.html

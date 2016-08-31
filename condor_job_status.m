@@ -72,7 +72,8 @@ for i = 1 : cluster.numJobs
     if isfield(cluster.job(i), 'clusterId')
 %         setenv('LD_LIBRARY_PATH')  % avoid shared library problems for `system`
         [status, result] = system(sprintf(...
-            'condor_q -userlog "%s" -af JobStatus ExitCode ExitSignal', cluster.job(i).log));
+            'condor_q -userlog "%s" -autoformat JobStatus ExitCode ExitSignal', ...
+            cluster.job(i).log));
         if status ~= 0
             error('error calling `condor_q`:\n  %s\n', result)
         end
