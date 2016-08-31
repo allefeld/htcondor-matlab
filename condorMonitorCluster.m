@@ -15,6 +15,12 @@ function condorMonitorCluster(clusterHandle)
 % load cluster data structure
 cluster = condor_get_cluster(clusterHandle);
 
+% is there something to monitor?
+if isempty(cluster.clusterIds)
+    fprintf(2, '%s has never been submitted!\n', clusterHandle);
+    return
+end
+
 % initialize file identifiers
 outFID = -1 * ones(cluster.numJobs, 1);     % Matlab standard output
 errFID = -1 * ones(cluster.numJobs, 1);     % Matlab standard error
@@ -51,8 +57,9 @@ sep = repmat(' | ', cluster.numJobs, 1);
 [statusSymbols, exitSymbols] = condor_job_status;
 
 % display loop
-while true
-    fprintf('\nscanning files, please wait')
+tic
+while toc <= 15     % wait after "all jobs completed"
+    fprintf('\n\nscanning files, please wait')
     % for each job
     for i = 1 : cluster.numJobs
         fprintf('.')
@@ -164,9 +171,13 @@ while true
         clusterHandle, cluster.description)
     disp([char(jobNumber) sep char(priMsg) sep char(secMsg) sep ...
         errInd exitInd statusInd sep char(jobId) sep char(logMsg)])
-    fprintf('\nabort with ctrl-c\n\n')
+    fprintf('\nabort with ctrl-c')
     pause(3)
+    if ~all(jobStatus == 4)
+        tic
+    end
 end
+fprintf([repmat(char(8), 1, 17) 'all jobs completed\n\n'])
 
 
 % This program is free software: you can redistribute it and/or modify it
