@@ -36,13 +36,15 @@ as argument and returns its square; unless the number is a prime, in which
 case an error is thrown.
 
 `clusterHandle` is a string of the form `cluster#` where `#` is a sequential
-number starting from 0. The handle is assigned when the __cluster is created__:
+number starting from 0. The handle is assigned when the __cluster is created__
+with
 
-    clusterHandle = condorCreateCluster
+    clusterHandle = condorCreateCluster(description)
 
-It is used to identify the cluster to all other functions.
+It is used to identify the cluster to all other functions. `description` is a
+string describing the cluster; it is automatically generated when omitted.
 
-A __job is defined__ and added to a cluster by:
+A __job is defined__ and added to a cluster by
 
     condorAddJob(clusterHandle, jobFun, argIn, numArgOut)
 
@@ -51,11 +53,11 @@ m-file (including private) as well as an anonymous, local, or nested function.
 `argIn` is a cell array containing the arguments to be passed to the job
 function, and `numArgOut` is the number of its output arguments.
 
-A cluster of jobs is __submitted__ to HTCondor using:
+A cluster of jobs is __submitted__ to HTCondor using
 
     condorSubmitCluster(clusterHandle)
 
-After submission, the progress of its jobs can be __monitored__ using:
+After submission, the progress of its jobs can be __monitored__ using
 
     condorMonitorCluster(clusterHandle)
 
@@ -95,7 +97,7 @@ The information is presented as text in the Command Window, or the terminal
 window if Matlab is used without GUI. This has the advantage that
 `condorMonitorCluster` can also be used under an `ssh` login.
 
-The __return values__ of the jobs in a cluster can be retrieved by:
+The __return values__ of the jobs in a cluster can be retrieved by
 
     results = condorGetResults(clusterHandle);
 
@@ -154,3 +156,4 @@ This software was developed with Matlab R2013a and [HTCondor
 Debian 7.8, but may work with other versions and OSs, too. It is copyrighted ©
 2016 by Carsten Allefeld and released under the terms of the GNU General
 Public License, version 3 or later.
+

@@ -165,11 +165,12 @@ while true
     
     % display monitor and pause
     clc
-    fprintf('\n                *** monitoring %s ***\n\n', clusterHandle)
+    fprintf('\n         *** %s: %s ***\n\n', ...
+        clusterHandle, cluster.description)
     disp([char(jobNumber) sep char(priMsg) sep char(secMsg) sep ...
         errInd exitInd statusInd sep char(jobId) sep char(logMsg)])
     fprintf('\nabort with ctrl-c\n\n')
-    pause(1)
+    pause(3)
 end
 
 

@@ -1,9 +1,10 @@
-function clusterHandle = condorCreateCluster
+function clusterHandle = condorCreateCluster(description)
 
 % create data structure and subdirectory to represent an HTCondor cluster
 %
-% clusterHandle = condorCreateCluster
+% clusterHandle = condorCreateCluster(description)
 %
+% description:    string describing cluster
 % clusterHandle:  handle of created cluster (string)
 %
 % See also condorAddJob, condorSubmitCluster, condorMonitorCluster,
@@ -14,6 +15,17 @@ function clusterHandle = condorCreateCluster
 % https://github.com/allefeld/htcondor-matlab
 % Copyright (C) 2016 Carsten Allefeld
 
+
+% generate description
+if nargin == 0
+    [ST, I] = dbstack;
+    if numel(ST) >= I + 1
+        description = ST(I + 1).name;
+    else
+        description = '';
+    end
+end
+description = strtrim([description ' ' datestr(now, '(yyyy-mm-dd HH:MM:SS)')])
 
 % get htcondor-matlab cluster directory from configuration
 conDir = condor_get_config('conDir');
@@ -32,6 +44,7 @@ clusterDir = [conDir clusterHandle filesep];
 
 % initialize cluster data structure
 cluster = struct;
+cluster.description = description;
 cluster.dir = clusterDir;
 cluster.numJobs = 0;
 cluster.clusterIds = [];                                                        %#ok<STRNU>
