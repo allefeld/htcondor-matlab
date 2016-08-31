@@ -22,7 +22,7 @@ if nargin == 0
         description = '';
     end
 end
-description = strtrim([description ' ' datestr(now, '(yyyy-mm-dd HH:MM:SS)')])
+description = strtrim([description ' ' datestr(now, '(yyyy-mm-dd HH:MM:SS)')]);
 
 % get htcondor-matlab cluster directory from configuration
 conDir = condor_get_config('conDir');
@@ -30,13 +30,13 @@ conDir = condor_get_config('conDir');
 % find last existing cluster index (subdirectory of htcondor-matlab cluster directory)
 listing = dir([conDir 'cluster*']);
 listing = listing([listing.isdir]);
-ind = cellfun(@(x)(str2double(x(numel('cluster') + 1 : end))), {listing.name}, ...
-    'UniformOutput', false);
-ind = max([ind{:}]);
-if isempty(ind), ind = 0; end
+number = cellfun(@(x)(str2double(x(numel('cluster') + 1 : end))), ...
+    {listing(:).name}, 'UniformOutput', false);
+number = max([number{:}]);
+if isempty(number), number = 0; end
 
 % generate new cluster handle
-clusterHandle = sprintf('cluster%ld', ind + 1);       % do we need "l"??
+clusterHandle = sprintf('cluster%ld', number + 1);      % do we need "l"??
 clusterDir = [conDir clusterHandle filesep];
 
 % initialize cluster data structure

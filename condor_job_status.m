@@ -10,6 +10,7 @@ function [jobStatus, exitCode, exitSignal] = condor_job_status(clusterHandle)
 % obtain status and exit code of all jobs of a cluster
 %
 % [jobStatus, exitCode, exitSignal] = condor_job_status(clusterHandle)
+% [statusSymbols, exitSymbols] = condor_job_status
 %
 % Uses `condor_q -userlog` to obtain information on removed and
 % completed jobs.
@@ -44,6 +45,14 @@ function [jobStatus, exitCode, exitSignal] = condor_job_status(clusterHandle)
 % If a job did not terminate abnormmaly, `condor_q -userlog` returns
 % 'undefined', which translates to an NaN value.
 
+
+% return symbols for job statūs
+if nargin == 0
+    jobStatus = 'IRXCH>S';
+    exitCode = '+-~';
+    return
+end
+
 % load cluster data structure
 clusterDir = [condor_get_config('conDir') clusterHandle filesep];
 load([clusterDir 'cluster.mat'], 'cluster')
@@ -58,14 +67,12 @@ for i = 1 : cluster.numJobs
         [status, result] = system(sprintf(...
             'condor_q -userlog "%s" -af JobStatus ExitCode ExitSignal', cluster.job(i).log));
         if status ~= 0
-            fprintf(2, 'condor_job_status has to be run on an HTCondor machine!\n');
             error('error calling `condor_q`:\n  %s\n', result)
         end
         result = strsplit(strtrim(result), ' ');
         jobStatus(i) = str2double(result{1});
         exitCode(i) = str2double(result{2});
         exitSignal(i) = str2double(result{3});
-        % ??? clear clusterId procId after job terminated
     end
 end
 

@@ -48,9 +48,8 @@ logMsg = cell(cluster.numJobs, 1);
 logMsg(:) = {'–'};
 % prepare column separator
 sep = repmat(' | ', cluster.numJobs, 1);
-% prepare symbols for job status
-statusSymbols = 'IRXCH>S';
-
+% get symbols for job status and exit
+[statusSymbols, exitSymbols] = condor_job_status;
 
 % display loop
 while true
@@ -156,9 +155,9 @@ while true
     [jobStatus, exitCode, exitSignal] = condor_job_status(clusterHandle);
     statusInd = statusSymbols(jobStatus)';
     exitInd = repmat(' ', cluster.numJobs, 1);
-    exitInd(exitCode == 0) = '+';       % exited successfully
-    exitInd(exitCode > 0) = '-';        % exited with error
-    exitInd(~isnan(exitSignal)) = '~';  % terminated by signal (crashed)
+    exitInd(exitCode == 0) = exitSymbols(1);       % exited successfully
+    exitInd(exitCode > 0) = exitSymbols(2);        % exited with error
+    exitInd(~isnan(exitSignal)) = exitSymbols(3);  % terminated by signal (crashed)
     
     % display monitor and pause
     clc
