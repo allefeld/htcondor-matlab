@@ -72,7 +72,6 @@ fprintf(fid, '[status, hostname] = system(''condor_config_val -raw HOSTNAME'');\
 fprintf(fid, 'if status ~= 0, hostname = ''localhost\\n''; end\n');
 fprintf(fid, 'fprintf([''job executing on '' slot ''@'' hostname])\n');
 %  -> prepare to run job
-fprintf(fid, 'clear\n');
 fprintf(fid, 'load(''%s'')\n', job.inf);
 fprintf(fid, 'path(jobInformation.path)\n');
 fprintf(fid, 'cd(jobInformation.wd)\n');
@@ -80,7 +79,12 @@ fprintf(fid, 'cd(jobInformation.wd)\n');
 fprintf(fid, 'condorResult = cell(1, jobInformation.numArgOut);\n');
 fprintf(fid, 'try\n');
 fprintf(fid, '    [condorResult{:}] = jobInformation.fun(jobInformation.argIn{:});\n');
-fprintf(fid, 'catch ME, fprintf(2, ''%%s\\n'', getReport(ME)); exit(1), end\n');
+fprintf(fid, 'catch ME\n');
+fprintf(fid, '    fprintf(2, ''%%s\\n'', getReport(ME));\n')
+fprintf(fid, '    if ~strcmp(slot, ''debug'')\n');
+fprintf(fid, '        exit(1)\n');
+fprintf(fid, '    end\n');
+fprintf(fid, 'end\n');
 %  -> save results
 fprintf(fid, 'save(''%s'', ''condorResult'')\n', job.res);
 fclose(fid);
