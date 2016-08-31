@@ -13,8 +13,7 @@ function condorMonitorCluster(clusterHandle)
 
 
 % load cluster data structure
-clusterDir = [condor_get_config('conDir') clusterHandle filesep];
-load([clusterDir 'cluster.mat'], 'cluster')
+cluster = condor_get_cluster(clusterHandle);
 
 % initialize file identifiers
 outFID = -1 * ones(cluster.numJobs, 1);     % Matlab standard output
@@ -48,7 +47,7 @@ logMsg = cell(cluster.numJobs, 1);
 logMsg(:) = {'–'};
 % prepare column separator
 sep = repmat(' | ', cluster.numJobs, 1);
-% get symbols for job status and exit
+% get symbols for job status and exit status
 [statusSymbols, exitSymbols] = condor_job_status;
 
 % display loop

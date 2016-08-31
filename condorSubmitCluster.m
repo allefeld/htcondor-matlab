@@ -18,11 +18,10 @@ if nargin < 2
 end
 
 % load cluster data structure
-clusterDir = [condor_get_config('conDir') clusterHandle filesep];
-load([clusterDir 'cluster.mat'], 'cluster')
+cluster = condor_get_cluster(clusterHandle);
 
 % already submitted?
-if ~isempty(cluster.clusterIds)                                                 %#ok<NODEF>
+if ~isempty(cluster.clusterIds)
     error('%s has already been submitted to HTCondor!', ...
         clusterHandle)
     % --> resubmit. warning that debug and resubmit don't go together
@@ -55,7 +54,7 @@ fclose(sdf);
 switch mode
     case 'submit'
         % submit cluster via `condor_submit`
-        setenv('LD_LIBRARY_PATH')  % avoid shared library problems for `system`
+%         setenv('LD_LIBRARY_PATH')  % avoid shared library problems for `system`
         [status, result] = system(['condor_submit ' sdfName]);
         if status ~= 0
             fprintf(2, 'condorSubmitCluster has to be run on an HTCondor machine!\n');
@@ -70,7 +69,8 @@ switch mode
             cluster.job(i).clusterId = clusterId;
             cluster.job(i).procId = i - 1;  % analogous to HTCondor
         end
-        save([clusterDir 'cluster.mat'], 'cluster')
+        save([condor_get_config('conDir') clusterHandle filesep ...
+            'cluster.mat'], 'cluster')
     case 'debug'
         % executing jobs locally and sequentially
         fprintf('condorSubmitCluster DEBUG MODE\n\n')

@@ -1,4 +1,4 @@
-    function condorAddJob(clusterHandle, jobFun, argIn, numArgOut)
+function condorAddJob(clusterHandle, jobFun, argIn, numArgOut)
 
 % define a job and add it to an HTCondor cluster
 %
@@ -34,11 +34,10 @@ if (nargout(jobFun) ~= 0) && (numArgOut == 0)
 end
 
 % load cluster data structure
-clusterDir = [condor_get_config('conDir') clusterHandle filesep];
-load([clusterDir 'cluster.mat'], 'cluster')
+cluster = condor_get_cluster(clusterHandle);
 
 % already submitted?
-if ~isempty(cluster.clusterIds)                                                 %#ok<NODEF>
+if ~isempty(cluster.clusterIds)
     error('%s has already been submitted to HTCondor!', ...
         clusterHandle)
 end
@@ -89,7 +88,8 @@ fclose(fid);
 % add job to cluster data structure and save
 cluster.numJobs = cluster.numJobs + 1;
 cluster.job(cluster.numJobs) = job;
-save([clusterDir 'cluster.mat'], 'cluster')
+save([condor_get_config('conDir') clusterHandle filesep ...
+    'cluster.mat'], 'cluster')
 fprintf('added job %03d to %s\n', cluster.numJobs, clusterHandle)
 
 

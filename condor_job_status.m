@@ -7,10 +7,18 @@ function [jobStatus, exitCode, exitSignal] = condor_job_status(clusterHandle)
 % https://github.com/allefeld/htcondor-matlab
 % Copyright (C) 2016 Carsten Allefeld
 
-% obtain status and exit code of all jobs of a cluster
+% obtain job status and exit status of all jobs of a cluster
 %
 % [jobStatus, exitCode, exitSignal] = condor_job_status(clusterHandle)
 % [statusSymbols, exitSymbols] = condor_job_status
+%
+% clusterHandle:  handle of cluster to be submitted
+% jobStatus,
+% exitCode,
+% exitSignal:     see below, array with one element for each job
+% statusSymbols,
+% exitSymbols:    define characters used to indicate job status and exit
+%                 status in the output of condorMonitorJob and condorClusters 
 %
 % Uses `condor_q -userlog` to obtain information on removed and
 % completed jobs.
@@ -54,8 +62,7 @@ if nargin == 0
 end
 
 % load cluster data structure
-clusterDir = [condor_get_config('conDir') clusterHandle filesep];
-load([clusterDir 'cluster.mat'], 'cluster')
+cluster = condor_get_cluster(clusterHandle);
 
 % run condor_q on jobs
 jobStatus = nan(cluster.numJobs, 1);
@@ -63,7 +70,7 @@ exitCode = nan(cluster.numJobs, 1);
 exitSignal = nan(cluster.numJobs, 1);
 for i = 1 : cluster.numJobs
     if isfield(cluster.job(i), 'clusterId')
-        setenv('LD_LIBRARY_PATH')  % avoid shared library problems for `system`
+%         setenv('LD_LIBRARY_PATH')  % avoid shared library problems for `system`
         [status, result] = system(sprintf(...
             'condor_q -userlog "%s" -af JobStatus ExitCode ExitSignal', cluster.job(i).log));
         if status ~= 0

@@ -14,8 +14,7 @@ function results = condorGetResults(clusterHandle)
 
 
 % load cluster data structure
-clusterDir = [condor_get_config('conDir') clusterHandle filesep];
-load([clusterDir 'cluster.mat'], 'cluster')
+cluster = condor_get_cluster(clusterHandle);
 
 % already submitted?
 if isempty(cluster.clusterIds)

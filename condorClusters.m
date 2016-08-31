@@ -22,7 +22,7 @@ number = cellfun(@(x)(str2double(x(numel('cluster') + 1 : end))), ...
 [number, ind] = sort([number{:}]);
 listing = listing(ind);
 
-% get symbols for job status and exit
+% get symbols for job status and exit status
 [statusSymbols, exitSymbols] = condor_job_status;
 
 % iterate through clusters
@@ -35,8 +35,7 @@ for i = 1 : numel(listing)
     try
         % load cluster data structure
         clusterHandle = listing(i).name;
-        clusterDir = [condor_get_config('conDir') clusterHandle filesep];
-        load([clusterDir 'cluster.mat'], 'cluster')
+        cluster = condor_get_cluster(clusterHandle);
         % get job's status
         [jobStatus, exitCode, exitSignal] = condor_job_status(clusterHandle);
         % statistics
