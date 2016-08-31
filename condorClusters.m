@@ -11,6 +11,7 @@ function condorClusters(mode)
 % Copyright (C) 2016 Carsten Allefeld
 
 
+% determine mode
 if nargin == 0
     mode = '';
 end
@@ -54,8 +55,8 @@ for i = 1 : nClusters
         fprintf('%4d', nStatus)
         fprintf('%4d', nExitSuccess, nExitError, nExitSignal)
         fprintf('   %s\n', cluster.description)
-        % removable: if there are no jobs in queue
-        removable(i) = ~any(ismember(jobStatus, [1 2 3 5 6 7]));
+        % removable: if all jobs are completed
+        removable(i) = all(jobStatus == 4);
     catch
         fprintf('– data corrupted –\n')
         % removable: corrupted clusters always
