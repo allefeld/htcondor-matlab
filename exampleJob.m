@@ -9,26 +9,18 @@ function j = exampleJob(i)
 % https://github.com/allefeld/htcondor-matlab
 % Copyright (C) 2016 Carsten Allefeld
 
-% print primary message
-fprintf('exampleJob\n')
 
-% print secondary message
-fprintf(' processing %d\n', i)
+fprintf('exampleJob\n')                         % print primary message
 
-% simulate error
-if isprime(i)
-    % print secondary message
-    fprintf(' %g is a prime, throwing error\n', i)
-    % generate error
-    error('argument is a prime number!')
-end
-
-% compute result
+fprintf(' processing %d\n', i)                  % print secondary message
+pause(5)    % act as if it's taking a while
 j = i ^ 2;
-pause(10)   % act as if it's taking a while
-
-% print secondary message
-fprintf(' returning %d\n', j)
+rng('shuffle')
+if rand < 0.5
+    error('exampleJob: an error occurred!')                 % generate error
+end
+pause(5)    % act as if it's taking a while
+fprintf(' returning %d\n', j)                   % print secondary message
 
 
 % This program is free software: you can redistribute it and/or modify it

@@ -13,48 +13,76 @@ function condorSubmitCluster(clusterHandle, mode)
 % Copyright (C) 2016 Carsten Allefeld
 
 
+% determine mode
 if nargin < 2
     mode = 'submit';
+end
+if strcmp(mode, 'debug')
+    fprintf('   *** DEBUG MODE ***\n\n')
 end
 
 % load cluster data structure
 cluster = condor_get_cluster(clusterHandle);
 
-% already submitted?
-if ~isempty(cluster.clusterIds)
-    error('%s has already been submitted to HTCondor!', ...
-        clusterHandle)
-    % --> resubmit. warning that debug and resubmit don't go together
+% which jobs to submit?
+if isempty(cluster.clusterIds)
+    % first submission
+    tosubmit = 1 : cluster.numJobs;
+else
+    % submitted before -> prepare resubmission
+    fprintf('%s has already been submitted to HTCondor\n', clusterHandle)
+    [jobStatus, exitCode, exitSignal] = condor_job_status(clusterHandle);
+    tosubmit = ...
+        ((jobStatus == 4) & (exitCode > 0)) ... % terminated normally with error
+        | ~isnan(exitSignal);                   % terminated abnormally
+    tosubmit = find(tosubmit(:))';
+    if isempty(tosubmit)
+        fprintf('  no jobs that can be resubmitted\n')
+        return
+    end
+    fprintf('  jobs that can be resubmitted:')
+    fprintf(' %03d', tosubmit - 1)
+    fprintf('\n')
+    inp = input('resubmit? y/n  ', 's');
+    if ~strcmp(inp, 'y')
+        return
+    end
 end
 
-% are there jobs?
-if cluster.numJobs == 0
-    error('cluster does not have any jobs!')
+% are there any jobs?
+if isempty(tosubmit)
+    fprintf(2, 'no jobs to submit!\n');
+    return
 end
 
 % generate HTCondor submit description file
 sdfName = [cluster.dir 'submit'];
 sdf = fopen(sdfName, 'w');
-% get general entries from configuration
+% write general entries from configuration
 submit = condor_get_config('submit');
-% write general entries
 fprintf(sdf, '%s\n', submit{:});
-fprintf(sdf, '\n');
 % write job-specific entries
-for i = 1 : cluster.numJobs
-    fprintf(sdf, 'Input  = %s\n', cluster.job(i).in);
-    fprintf(sdf, 'Output = %s\n', cluster.job(i).out);
-    fprintf(sdf, 'Error  = %s\n', cluster.job(i).err);
-    fprintf(sdf, 'Log    = %s\n', cluster.job(i).log);
-    fprintf(sdf, 'Queue\n');
+for ji = tosubmit
     fprintf(sdf, '\n');
+    fprintf(sdf, 'Input  = %s\n', cluster.job(ji).in);
+    fprintf(sdf, 'Output = %s\n', cluster.job(ji).out);
+    fprintf(sdf, 'Error  = %s\n', cluster.job(ji).err);
+    fprintf(sdf, 'Log    = %s\n', cluster.job(ji).log);
+    fprintf(sdf, 'Queue\n');
 end
 fclose(sdf);
 
 switch mode
     case 'submit'
+        % delete old log files, because HTCondor appends,
+        % confusing `condor_q -userlog`
+        for ji = tosubmit
+            if exist(cluster.job(ji).log, 'file')
+                delete(cluster.job(ji).log)
+            end
+        end
         % submit cluster via `condor_submit`
-%         setenv('LD_LIBRARY_PATH')  % avoid shared library problems for `system`
+        %         setenv('LD_LIBRARY_PATH')  % avoid shared library problems for `system`
         [status, result] = system(['condor_submit ' sdfName]);
         if status ~= 0
             fprintf(2, 'condorSubmitCluster has to be run on an HTCondor machine!\n');
@@ -65,22 +93,21 @@ switch mode
             clusterHandle, clusterId)
         % add ClusterId and ProcId to cluster data structure and save
         cluster.clusterIds = [cluster.clusterIds clusterId];
-        for i = 1 : cluster.numJobs
-            cluster.job(i).clusterId = clusterId;
-            cluster.job(i).procId = i - 1;  % analogous to HTCondor
+        for i = 1 : numel(tosubmit)
+            cluster.job(tosubmit(i)).clusterId = clusterId;
+            cluster.job(tosubmit(i)).procId = i - 1;   % infer HTCondor's assignment
         end
         save([condor_get_config('conDir') clusterHandle filesep ...
             'cluster.mat'], 'cluster')
     case 'debug'
         % executing jobs locally and sequentially
-        fprintf('condorSubmitCluster DEBUG MODE\n\n')
         setenv('_CONDOR_SLOT', 'debug')     % needed by input script
-        for i = 1 : cluster.numJobs
-            runContained(cluster.job(i).in) % execute input script
+        for ji = tosubmit
+            runContained(cluster.job(ji).in) % execute input script
         end
         setenv('_CONDOR_SLOT')
     otherwise
-        error('unknown mode "%s"!', mode)
+        fprintf(2, 'unknown mode "%s"!\n', mode);
 end
 
 
