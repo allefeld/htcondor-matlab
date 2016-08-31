@@ -10,9 +10,6 @@
 % numArgOut:      number of output arguments of jobFun to be captured
 %                 guessed if not specified
 %
-% See also condorCreateCluster, condorSubmitCluster, condorMonitorCluster,
-% condorGetResults 
-%
 %
 % This file is part of the development version of htcondor-matlab, see
 % https://github.com/allefeld/htcondor-matlab

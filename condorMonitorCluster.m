@@ -6,9 +6,6 @@ function condorMonitorCluster(clusterHandle)
 %
 % clusterHandle:  handle of cluster to be monitored
 %
-% See also condorCreateCluster, condorAddJob, condorSubmitCluster,
-% condorGetResults
-%
 %
 % This file is part of the development version of htcondor-matlab, see
 % https://github.com/allefeld/htcondor-matlab

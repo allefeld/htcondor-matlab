@@ -7,9 +7,6 @@ function clusterHandle = condorCreateCluster(description)
 % description:    string describing cluster
 % clusterHandle:  handle of created cluster (string)
 %
-% See also condorAddJob, condorSubmitCluster, condorMonitorCluster,
-% condorGetResults
-%
 %
 % This file is part of the development version of htcondor-matlab, see
 % https://github.com/allefeld/htcondor-matlab

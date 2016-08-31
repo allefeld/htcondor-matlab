@@ -7,9 +7,6 @@ function results = condorGetResults(clusterHandle)
 % clusterHandle:  handle of cluster
 % results:        cell array of jobs' return values
 %
-% See also condorCreateCluster, condorAddJob, condorSubmitCluster,
-% condorMonitorCluster
-%
 %
 % This file is part of the development version of htcondor-matlab, see
 % https://github.com/allefeld/htcondor-matlab

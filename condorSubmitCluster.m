@@ -7,12 +7,6 @@ function condorSubmitCluster(clusterHandle, mode)
 %
 % clusterHandle:  handle of cluster to be submitted
 %
-% If 'debug' is specified as a second argument, jobs are not submitted to
-% condor but executed locally and sequentially.
-%
-% See also condorCreateCluster, condorAddJob, condorMonitorCluster,
-% condorGetResults
-%
 %
 % This file is part of the development version of htcondor-matlab, see
 % https://github.com/allefeld/htcondor-matlab
@@ -99,8 +93,6 @@ catch ME
     fprintf('*** job aborted with error:\n')
     fprintf(2, '%s\n', getReport(ME));
 end
-
-
 
 
 % This program is free software: you can redistribute it and/or modify it

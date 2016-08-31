@@ -57,6 +57,10 @@ A cluster of jobs is __submitted__ to HTCondor using
 
     condorSubmitCluster(clusterHandle)
 
+If `'debug'` is given as a second argument, jobs are not submitted to HTCondor
+but executed locally and sequentially, to facilitate finding programming
+errors.
+
 After submission, the progress of its jobs can be __monitored__ using
 
     condorMonitorCluster(clusterHandle)
