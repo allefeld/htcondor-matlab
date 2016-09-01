@@ -19,36 +19,38 @@ existing and writable directory, the *htcondor-matlab* cluster directory,
 which has to be accessible from all HTCondor machines.
 
 
-## Usage
+## Example
 
 The code for creating and submitting a cluster of jobs has the following form:
 
     clusterHandle = condorCreateCluster;
-    for i = 1 : 10
-       condorAddJob(clusterHandle, @exampleJob, {i}, 1)
+    for i = 1 : 16
+        condorAddJob(clusterHandle, @exampleJob, {i}, 1)
     end
     condorSubmitCluster(clusterHandle)
 
-In this example, the resulting cluster consists of 10 jobs, where each job
-runs `exampleJob(i)` with values of `i` from 1 to 10. The job function used
-here is included as `exampleJob.m` with *htcondor-matlab*. It takes a number
-as argument and returns its square; unless the number is a prime, in which
-case an error is thrown.
+In this example, the resulting cluster consists of 16 jobs, where each job runs
+`exampleJob(i)` with values of `i` from 1 to 16. The job function used here is
+included as `exampleJob.m` with *htcondor-matlab*; it takes a number as
+argument and returns its square.
 
-`clusterHandle` is a string of the form `cluster#` where `#` is a sequential
-number starting from 0. The handle is assigned when the __cluster is created__
-with
 
-    clusterHandle = condorCreateCluster(description)
+## Usage
 
-It is used to identify the cluster to all other functions. `description` is a
-string describing the cluster; it is automatically generated when omitted.
+A __cluster is created__ by
 
-A __job is defined__ and added to a cluster by
+    clusterHandle = condorCreateCluster(description);
+
+The cluster is assigned a handle, which is a string of the form `cluster#`
+where `#` is a sequential number starting from 0. It is used to identify the
+cluster to all other functions. The cluster can be given a descriptive label,
+but one is automatically generated if the argument is omitted.
+
+A __job is added__ to a cluster by
 
     condorAddJob(clusterHandle, jobFun, argIn, numArgOut)
 
-`jobFun` is the function handle of the job function; it can reference an
+`jobFun` is the function handle of the Matlab job function; it can reference an
 m-file (including private) as well as an anonymous, local, or nested function.
 `argIn` is a cell array containing the arguments to be passed to the job
 function, and `numArgOut` is the number of its output arguments.
@@ -57,11 +59,14 @@ A cluster of jobs is __submitted__ to HTCondor using
 
     condorSubmitCluster(clusterHandle)
 
-If `'debug'` is given as a second argument, jobs are not submitted to HTCondor
-but executed locally and sequentially, to facilitate finding programming
-errors.
+A cluster can be __resubmitted__ with the same syntax, in case one or more of
+its jobs failed. Suitable jobs (neither still running nor completed
+successfully) are automatically identified and only they are resubmitted. If
+`'debug'` is given as a second argument to `condorSubmitCluster`, jobs are not
+submitted to HTCondor but executed locally and sequentially, to facilitate
+finding programming errors.
 
-After submission, the progress of its jobs can be __monitored__ using
+After submission, the progress of a cluster's jobs can be __monitored__ using
 
     condorMonitorCluster(clusterHandle)
 
@@ -88,10 +93,10 @@ structure:
 – The 3rd column shows the last secondary message since the last primary
 message.  
 – In the 4th column, jobs that have Matlab error messages are marked with ‘∗’.
-Jobs which exited successfully are marked with ‘+’, which exited with an error
-are marked with ‘-’, and which crashed are marked with ‘~’. Additionally the
-HTCondor job status is indicated by one of the letters ‘I’ = idle, ‘R’ =
-running, ‘X’ = removed, ‘C’ = completed, or ‘H’ = on hold.  
+Jobs that exited successfully are marked with ‘+’, that exited with an error
+are marked with ‘-’, and that crashed are marked with ‘~’. The HTCondor job
+status is indicated by one of the letters ‘I’ = idle, ‘R’ = running, ‘X’ =
+removed, ‘C’ = completed, or ‘H’ = on hold.  
 – The 5th column shows the HTCondor job identifier in the form
 ClusterId.ProcId.  
 – The 6th column shows the last event from the HTCondor log (excluding ‘image
@@ -107,9 +112,9 @@ The __return values__ of the jobs in a cluster can be retrieved by
 
 `results` is a cell array with one element per job. If a job exited
 successfully, the corresponding element is a cell array containing the return
-value(s) of that job. If a job is not (yet) completed, the element is an empty
-array. Instead of or in addition to returning values, job functions can of
-course also write their results directly to files.
+value(s) of that job. If a job did not (yet) exit successfully, the element is
+an empty array. Instead of or in addition to returning values, job functions
+can of course also write their results directly to files.
 
 A __list__ of all existing clusters, including summary statistics about their
 jobs’ status, can be obtained by
@@ -120,22 +125,34 @@ It uses the same symbols as `condorMonitorCluster`, see above. Old clusters can
 be removed using `condorClusters clean`.
 
 
+## Example continued
+
+With a probability of 50%, the job function `exampleJob` does not complete
+successfully, but throws an error. This is to simulate the fragility of job
+execution in real applications.
+
+Monitor the submitted cluster until all the jobs have completed (symbol ‘C’).
+Most likely, some of them will have failed (symbol ‘-’). In that case, resubmit
+the cluster and monitor it again. Repeat this procedure until all jobs have
+completed successfully (symbol ‘+’). After that, the retrieved `results` should
+be a cell array of cell arrays containing the square numbers from 1 to 256.
+
+
 ## Clusters, jobs, handles, and IDs
 
-*htcondor-matlab* adopts the terminology of HTCondor: A single computation
-unit is called a ‘job’, and a group of jobs belonging together is called a
+*htcondor-matlab* adopts the terminology of HTCondor: A single computation unit
+is called a ‘job’, and a group of jobs belonging together is called a
 ‘cluster’. In HTCondor, a job is also called a ‘process’ after submission.
-Cluster IDs are integers assigned by HTCondor sequentially on submission, and
+Cluster IDs are integers assigned by HTCondor in the order of submission, and
 process IDs are integers assigned to jobs in the order of the submit
 description file, starting from 0 within a cluster.
 
-For technical reasons, the `clusterHandle` assigned by *htcondor-matlab* is
-not identical to HTCondor’s ClusterId, and the job number assigned by
-*htcondor-matlab* can differ from HTCondor’s ProcId. However,
-`condorMonitorCluster` lists for each job the corresponding identifier of the
-form ClusterId.ProcId used by HTCondor, so that its tools including
-[`condor_q`](http://research.cs.wisc.edu/htcondor/manual/v8.2.3/condor_q.html)
-and
+For technical reasons, the `clusterHandle` assigned by *htcondor-matlab* is not
+identical to HTCondor’s ClusterId. On first submission, the job number assigned
+by *htcondor-matlab* is identical to HTCondor’s ProcId, but resubmitted jobs
+belong to a new HTCondor cluster, with ProcIds starting from 0 again.
+However, `condorMonitorCluster` lists for each job the corresponding identifier
+of the form ClusterId.ProcId used by HTCondor, so that its tools including
 [`condor_rm`](http://research.cs.wisc.edu/htcondor/manual/v8.2.3/condor_rm.html)
 can be easily used in conjunction.
 
@@ -144,14 +161,14 @@ can be easily used in conjunction.
 
 In the *htcondor-matlab* cluster directory, for each cluster a subdirectory is
 created with a name identical to its handle, `cluster#`, which contains data to
-manage and run the cluster as well as the return values of completed jobs.  To
-save disk space, it is advisable to remove old clusters from time to time, see
-above.
+manage and run the cluster as well as the return values of completed jobs. To
+save disk space, it is advisable to remove old clusters from time to time
+(`condorClusters clean`).
 
 Within each cluster subdirectory, general cluster and job management data are
-kept in `cluster.mat`. After submission, the cluster’s HTcondor submit
+kept in `cluster.mat`. After submission, the cluster’s HTCondor submit
 description file is `submit`. Job-specific data are in files whose name begins
-with `job###`, where `###` is the job number. On submission, the file
+with `job###`, where `###` is the job number. On addition of a job, the file
 `job###_in.m` containing the job’s Matlab input script and the file
 `job###_inf.mat` with job information used by that script are created. The
 job’s *standard output* is redirected to the file `job###_out` and its
