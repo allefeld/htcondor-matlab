@@ -80,7 +80,7 @@ fprintf(fid, 'condorResult = cell(1, jobInformation.numArgOut);\n');
 fprintf(fid, 'try\n');
 fprintf(fid, '    [condorResult{:}] = jobInformation.fun(jobInformation.argIn{:});\n');
 fprintf(fid, 'catch ME\n');
-fprintf(fid, '    fprintf(2, ''%%s\\n'', getReport(ME));\n')
+fprintf(fid, '    fprintf(2, ''%%s\\n'', getReport(ME));\n');
 fprintf(fid, '    if ~strcmp(slot, ''debug'')\n');
 fprintf(fid, '        exit(1)\n');
 fprintf(fid, '    end\n');

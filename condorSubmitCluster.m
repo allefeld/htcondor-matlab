@@ -43,8 +43,7 @@ else
     fprintf('  jobs that can be resubmitted:')
     fprintf(' %03d', tosubmit - 1)
     fprintf('\n')
-    inp = input('resubmit? y/n  ', 's');
-    if ~strcmp(inp, 'y')
+    if ~strcmp(input('resubmit? y/n  ', 's'), 'y')
         return
     end
 end
@@ -62,12 +61,12 @@ sdf = fopen(sdfName, 'w');
 submit = condor_get_config('submit');
 fprintf(sdf, '%s\n', submit{:});
 % write job-specific entries
-for ji = tosubmit
+for jn = tosubmit
     fprintf(sdf, '\n');
-    fprintf(sdf, 'Input  = %s\n', cluster.job(ji).in);
-    fprintf(sdf, 'Output = %s\n', cluster.job(ji).out);
-    fprintf(sdf, 'Error  = %s\n', cluster.job(ji).err);
-    fprintf(sdf, 'Log    = %s\n', cluster.job(ji).log);
+    fprintf(sdf, 'Input  = %s\n', cluster.job(jn).in);
+    fprintf(sdf, 'Output = %s\n', cluster.job(jn).out);
+    fprintf(sdf, 'Error  = %s\n', cluster.job(jn).err);
+    fprintf(sdf, 'Log    = %s\n', cluster.job(jn).log);
     fprintf(sdf, 'Queue\n');
 end
 fclose(sdf);
@@ -76,9 +75,9 @@ switch mode
     case 'submit'
         % delete old log files, because HTCondor appends,
         % confusing `condor_q -userlog`
-        for ji = tosubmit
-            if exist(cluster.job(ji).log, 'file')
-                delete(cluster.job(ji).log)
+        for jn = tosubmit
+            if exist(cluster.job(jn).log, 'file')
+                delete(cluster.job(jn).log)
             end
         end
         % submit cluster via `condor_submit`
@@ -102,8 +101,8 @@ switch mode
     case 'debug'
         % executing jobs locally and sequentially
         setenv('_CONDOR_SLOT', 'debug')     % needed by input script
-        for ji = tosubmit
-            runContained(cluster.job(ji).in) % execute input script
+        for jn = tosubmit
+            runContained(cluster.job(jn).in) % execute input script
         end
         setenv('_CONDOR_SLOT')
     otherwise
