@@ -27,14 +27,21 @@ number = cellfun(@(x)(str2double(x(numel('cluster') + 1 : end))), ...
     {listing(:).name}, 'UniformOutput', false);
 [number, ind] = sort([number{:}]);
 listing = listing(ind);
-nClusters = numel(listing);
 
 % get symbols for job status and exit status
 [statusSymbols, exitSymbols] = condor_job_status;
 
+% are there any clusters?
+nClusters = numel(listing);
+if nClusters == 0
+    fprintf('there are no clusters\n')
+    return
+end
+
 % iterate through clusters
 fprintf('cluster  ')
 fprintf('%4c', statusSymbols)
+fprintf('   ?')
 fprintf('%4c', exitSymbols)
 fprintf('   description\n')
 removable = false(nClusters, 1);
@@ -48,15 +55,17 @@ for i = 1 : nClusters
         [jobStatus, exitCode, exitSignal] = condor_job_status(clusterHandle);
         % statistics
         nStatus = hist(jobStatus, 1 : numel(statusSymbols));
+        nUndefinedStatus = sum(isnan(jobStatus));
         nExitSuccess = sum(exitCode == 0);
         nExitError = sum(exitCode > 0);
         nExitSignal = sum(~isnan(exitSignal));
         % output
         fprintf('%4d', nStatus)
+        fprintf('%4d', nUndefinedStatus)
         fprintf('%4d', nExitSuccess, nExitError, nExitSignal)
         fprintf('   %s\n', cluster.description)
-        % removable: if all jobs are completed
-        removable(i) = all(jobStatus == 4);
+        % removable: if all jobs are either never submitted, removed, completed, or on hold
+        removable(i) = all(ismember(jobStatus, [3, 4, 5]) | isnan(jobStatus));
     catch
         fprintf('– data corrupted –\n')
         % removable: corrupted clusters always

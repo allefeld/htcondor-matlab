@@ -55,7 +55,7 @@ m-file (including private) as well as an anonymous, local, or nested function.
 `argIn` is a cell array containing the arguments to be passed to the job
 function, and `numArgOut` is the number of its output arguments.
 
-A cluster of jobs is __submitted__ to HTCondor using
+A cluster of jobs is __submitted__ to HTCondor by
 
     condorSubmitCluster(clusterHandle)
 
@@ -105,6 +105,11 @@ size updated’)
 The information is presented as text in the Command Window, or the terminal
 window if Matlab is used without GUI. This has the advantage that
 `condorMonitorCluster` can also be used under an `ssh` login.
+
+An error during job execution can be diagnosed by __inspecting__ the output,
+error, and HTCondor log of a job using
+
+    condorInspect(clusterHandle, jobNumber)
 
 The __return values__ of the jobs in a cluster can be retrieved by
 

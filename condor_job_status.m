@@ -52,6 +52,9 @@ function [jobStatus, exitCode, exitSignal] = condor_job_status(clusterHandle)
 %   http://research.cs.wisc.edu/htcondor/manual/v8.2.3/12_Appendix_A.html#91001
 % If a job did not terminate abnormally, `condor_q -userlog` returns
 % 'undefined', which translates to an NaN value.
+%
+% The function returns NaN in all output arguments if the corresponding job
+% has never been submitted.
 
 
 % return symbols for job statūs
@@ -77,10 +80,12 @@ for i = 1 : cluster.numJobs
         if status ~= 0
             error('error calling `condor_q`:\n  %s\n', result)
         end
-        result = strsplit(strtrim(result), ' ');
-        jobStatus(i) = str2double(result{1});
-        exitCode(i) = str2double(result{2});
-        exitSignal(i) = str2double(result{3});
+        if ~isempty(result)
+            result = strsplit(strtrim(result), ' ');
+            jobStatus(i) = str2double(result{1});
+            exitCode(i) = str2double(result{2});
+            exitSignal(i) = str2double(result{3});
+        end
     end
 end
 
