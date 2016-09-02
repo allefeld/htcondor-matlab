@@ -6,8 +6,8 @@ software framework, to submit Matlab functions as jobs.
 
 It is assumed that the HTCondor machines share a filesystem and that all
 machines have access to the resources necessary to run the jobs, including an
-installation of Matlab. The functions use HTCondor commands and have therefore
-to be run on one of the HTCondor machines.
+identical installation of Matlab. The functions use HTCondor commands and have
+therefore to be run on one of the HTCondor machines.
 
 
 ## Installation
