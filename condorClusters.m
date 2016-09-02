@@ -64,8 +64,8 @@ for i = 1 : nClusters
         fprintf('%4d', nUndefinedStatus)
         fprintf('%4d', nExitSuccess, nExitError, nExitSignal)
         fprintf('   %s\n', cluster.description)
-        % removable: if all jobs are either never submitted, removed, completed, or on hold
-        removable(i) = all(ismember(jobStatus, [3, 4, 5]) | isnan(jobStatus));
+        % removable: if all jobs are either never submitted, removed, or completed
+        removable(i) = all(ismember(jobStatus, [3, 4]) | isnan(jobStatus));
     catch
         fprintf('– data corrupted –\n')
         % removable: corrupted clusters always

@@ -34,7 +34,8 @@ else
     [jobStatus, exitCode, exitSignal] = condor_job_status(clusterHandle);
     tosubmit = ...
         ((jobStatus == 4) & (exitCode > 0)) ... % terminated normally with error
-        | ~isnan(exitSignal);                   % terminated abnormally
+        | ~isnan(exitSignal) ...                % terminated abnormally
+        | (jobStatus == 3);                     % removed
     tosubmit = find(tosubmit(:))';
     if isempty(tosubmit)
         fprintf('  no jobs that can be resubmitted\n')
@@ -81,7 +82,6 @@ switch mode
             end
         end
         % submit cluster via `condor_submit`
-        %         setenv('LD_LIBRARY_PATH')  % avoid shared library problems for `system`
         [status, result] = system(['condor_submit ' sdfName]);
         if status ~= 0
             fprintf(2, 'condorSubmitCluster has to be run on an HTCondor machine!\n');
