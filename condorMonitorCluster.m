@@ -120,7 +120,7 @@ while toc <= 15     % wait after "all jobs completed"
                 errInd(i) = '*';
                 % but reset indicator when Matlab input script starts
                 % (because there are irrelevant error messages during Matlab startup)
-                if strcmp(line, '***********************')
+                if strcmp(line, '**** Matlab started****')
                     % marker written by input script, see condorAddJob
                     errInd(i) = ' ';
                 end
