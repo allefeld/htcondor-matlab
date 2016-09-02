@@ -44,7 +44,7 @@ fprintf('%4c', statusSymbols)
 fprintf('   ?')
 fprintf('%4c', exitSymbols)
 fprintf('   description\n')
-removable = false(nClusters, 1);
+deletable = false(nClusters, 1);
 for i = 1 : nClusters
     fprintf('%7d  ', number(i))
     try
@@ -64,25 +64,25 @@ for i = 1 : nClusters
         fprintf('%4d', nUndefinedStatus)
         fprintf('%4d', nExitSuccess, nExitError, nExitSignal)
         fprintf('   %s\n', cluster.description)
-        % removable: if all jobs are either never submitted, removed, or completed
-        removable(i) = all(ismember(jobStatus, [3, 4]) | isnan(jobStatus));
+        % deletable: if all jobs are either never submitted, removed, or completed
+        deletable(i) = all(ismember(jobStatus, [3, 4]) | isnan(jobStatus));
     catch
         fprintf('– data corrupted –\n')
-        % removable: corrupted clusters always
-        removable(i) = true;
+        % deletable: corrupted clusters always
+        deletable(i) = true;
     end
 end
 fprintf('\n')
 
 % cleaning
 old = (now - [listing(:).datenum]' > condor_get_config('oldTime'));
-toremove = (old & removable);
+todelete = (old & deletable);
 if strcmp(mode, 'clean')
-    fprintf('of %d old cluster subdirectories, %d can be removed\n\n', ...
-        sum(old), sum(toremove))
-    if sum(toremove) > 0
-        fprintf('removing cluster subdirectories in\n  %s\n', conDir)
-        for i = find(toremove)'
+    fprintf('of %d old cluster subdirectories, %d can be deleted\n\n', ...
+        sum(old), sum(todelete))
+    if sum(todelete) > 0
+        fprintf('deleting cluster subdirectories in\n  %s\n', conDir)
+        for i = find(todelete)'
             [status, message] = rmdir([conDir listing(i).name], 's');
             if status == 1
                 fprintf('%s\n', listing(i).name)
@@ -92,10 +92,10 @@ if strcmp(mode, 'clean')
         end
     end
 else
-    if sum(toremove) > 0
-        fprintf('of %d old cluster subdirectories, %d can be removed:\n', ...
-            sum(old), sum(toremove))
-        fprintf(' %d', number(toremove))
+    if sum(todelete) > 0
+        fprintf('of %d old cluster subdirectories, %d can be deleted:\n', ...
+            sum(old), sum(todelete))
+        fprintf(' %d', number(todelete))
         fprintf('\n')
         fprintf(2, 'consider calling `condorClusters clean`\n');
     end
