@@ -54,18 +54,19 @@ for i = 1 : nClusters
         % get job's status
         [jobStatus, exitCode, exitSignal] = condor_job_status(clusterHandle);
         % statistics
-        nStatus = hist(jobStatus, 1 : numel(statusSymbols));
-        nUndefinedStatus = sum(isnan(jobStatus));
-        nExitSuccess = sum(exitCode == 0);
-        nExitError = sum(exitCode > 0);
-        nExitSignal = sum(~isnan(exitSignal));
+        nStatus = hist(jobStatus, 1 : numel(statusSymbols) + 1);
+        nUndefinedStatus = sum(isnan(jobStatus));   % never submitted
+        nExitSuccess = sum(exitCode == 0);          % terminated normally & successfully
+        nExitError = sum(exitCode > 0);             % terminated normally but with error
+        nExitSignal = sum(~isnan(exitSignal));      % terminated abnormally
         % output
         fprintf('%4d', nStatus)
         fprintf('%4d', nUndefinedStatus)
         fprintf('%4d', nExitSuccess, nExitError, nExitSignal)
         fprintf('   %s\n', cluster.description)
-        % deletable: if all jobs are either never submitted, removed, or completed
-        deletable(i) = all(ismember(jobStatus, [3, 4]) | isnan(jobStatus));
+        % deletable: if all jobs are either never submitted, removed, completed,
+        % or held (because these are periodically removed)
+        deletable(i) = all(isnan(jobStatus) | ismember(jobStatus, [3, 4, 5]));
     catch
         fprintf('– data corrupted –\n')
         % deletable: corrupted clusters always

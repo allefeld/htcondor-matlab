@@ -28,9 +28,10 @@ submit = {
     % do not change!
     'Universe              = vanilla'           % necessary for Matlab
     'Transfer_Executable   = False'             % local/shared installation is assumed
-    'Want_Graceful_Removal = False'             % make removal immediate
+    'Periodic_Remove       = (JobStatus == 5) && (time() - EnteredCurrentStatus > 60 * 60)'
+                                                % remove held jobs after one hour
     % notification; it may be necessary to set Notify_User to your email address
-    'Notification          = Complete'          % get email when the job terminates
+    'Notification          = Complete'          % get email when the job leaves the queue
     % location and parameters of Matlab executable
    ['Executable            = ' fullfile(matlabroot, 'bin', 'matlab')]
     'Arguments             = -nodisplay -nojvm' % enable Java if necessary

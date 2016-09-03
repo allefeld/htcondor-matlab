@@ -32,10 +32,11 @@ else
     % submitted before -> prepare resubmission
     fprintf('%s has already been submitted to HTCondor\n', clusterHandle)
     [jobStatus, exitCode, exitSignal] = condor_job_status(clusterHandle);
-    tosubmit = ...
-        ((jobStatus == 4) & (exitCode > 0)) ... % terminated normally with error
-        | ~isnan(exitSignal) ...                % terminated abnormally
-        | (jobStatus == 3);                     % removed
+    tosubmit = ...                               % resubmit if job ...
+        ((jobStatus == 4) & (exitCode > 0)) ...  % terminated normally with error
+        | ~isnan(exitSignal) ...                 % terminated abnormally
+        | (jobStatus == 3) ...                   % was removed
+        | (jobStatus == 5);                      % is held (periodically removed)
     tosubmit = find(tosubmit(:))';
     if isempty(tosubmit)
         fprintf('  no jobs that can be resubmitted\n')

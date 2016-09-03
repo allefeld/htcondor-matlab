@@ -146,12 +146,14 @@ while toc <= 15     % wait after "all jobs completed"
                     if code ~= 6    % "Image size of job updated" -> ignore
                         logMsg{i} = line(21 : end);
                     end
-                    if code == 5    % "Job terminated" -> append termination description
-                        line = fgetl(logFID(i));
-                        if ischar(line)
-                            logMsg{i} = [logMsg{i} ' ' line(6 : end)];
-                        end
-                    end
+%                     if (code == 5) || (code == 12)
+%                         % "Job terminated" -> append termination description
+%                         % "Job was held" -> append hold reason
+%                         line = fgetl(logFID(i));
+%                         if ischar(line)
+%                             logMsg{i} = [logMsg{i} ' ' strtrim(line)];
+%                         end
+%                     end
                 end
             end
         end
@@ -161,9 +163,9 @@ while toc <= 15     % wait after "all jobs completed"
     [jobStatus, exitCode, exitSignal] = condor_job_status(clusterHandle);
     statusInd = statusSymbols(jobStatus)';
     exitInd = repmat(' ', cluster.numJobs, 1);
-    exitInd(exitCode == 0) = exitSymbols(1);       % exited successfully
-    exitInd(exitCode > 0) = exitSymbols(2);        % exited with error
-    exitInd(~isnan(exitSignal)) = exitSymbols(3);  % terminated by signal (crashed)
+    exitInd(exitCode == 0) = exitSymbols(1);       % terminated normally & successfully
+    exitInd(exitCode > 0) = exitSymbols(2);        % terminated normally but with error
+    exitInd(~isnan(exitSignal)) = exitSymbols(3);  % terminated abnormally
     
     % display monitor and pause
     clc
@@ -173,7 +175,9 @@ while toc <= 15     % wait after "all jobs completed"
         errInd exitInd statusInd sep char(jobId) sep char(logMsg)])
     fprintf('\nabort with ctrl-c')
     pause(3)
-    if ~all(jobStatus == 4)
+    % end monitoring if nothing will change anymore, i.e. all jobs are either
+    % removed, completed, or held
+    if ~all(ismember(jobStatus, [3, 4, 5]))
         tic
     end
 end

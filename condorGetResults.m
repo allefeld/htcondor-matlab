@@ -1,6 +1,6 @@
 function results = condorGetResults(clusterHandle)
 
-% retrieve results of finished jobs of an HTCondor cluster
+% retrieve results of an HTCondor cluster
 %
 % results = condorGetResults(clusterHandle)
 %

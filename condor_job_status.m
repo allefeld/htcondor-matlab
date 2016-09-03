@@ -20,8 +20,8 @@ function [jobStatus, exitCode, exitSignal] = condor_job_status(clusterHandle)
 % exitSymbols:    define characters used to indicate job status and exit
 %                 status in the output of condorMonitorJob and condorClusters 
 %
-% Uses `condor_q -userlog` to obtain information on removed and
-% completed jobs.
+% Uses `condor_q -userlog` to obtain information on jobs incl. removed and
+% completed ones.
 %
 % JobStatus according to
 %   http://research.cs.wisc.edu/htcondor/manual/v8.2.3/12_Appendix_A.html#91160
@@ -34,14 +34,15 @@ function [jobStatus, exitCode, exitSignal] = condor_job_status(clusterHandle)
 %     5: Held                 H
 %     6: Transferring Output  >
 %     7: Suspended            S
-% Jobs with status 1, 2, 5, and 7 are still in queue.
-% Jobs with status 3 (removed) may still be in queue. (But not with our
-% configuration?)
-% It is unclear whether jobs with status 6 (Transferring Output) are still
-% in queue, but we better treat them as such. (Shouldn't occur with our
-% configuration?)
-% Additional job statūs are listed under "ST" and "STATUS" in the
-% documentation of `condor_q`; it is unclear whether or when they occur.
+% An additional job status is listed under "ST" in the documentation of `condor_q`:
+%        Transferring Input <
+% but with no corresponding JobStatus value.
+% 
+% Jobs with status 1, 2, 7 are in the queue.
+% Jobs with status 5 are still in the queue, but are periodically removed, so
+% they may be treated as such.
+% 'Transferring' states should not occur with our configuration. To be
+% safe, they should be treated the same as 'Running'.
 %
 % ExitCode according to
 %   http://research.cs.wisc.edu/htcondor/manual/v8.2.3/12_Appendix_A.html#90997
@@ -53,8 +54,8 @@ function [jobStatus, exitCode, exitSignal] = condor_job_status(clusterHandle)
 % If a job did not terminate abnormally, `condor_q -userlog` returns
 % 'undefined', which translates to an NaN value.
 %
-% The function returns NaN in all output arguments if the corresponding job
-% has never been submitted.
+% The function returns NaN for a job in all output arguments if its
+% HTCondor log file does not exist (the job has never been submitted) or is empty.
 
 
 % return symbols for job statūs
@@ -72,7 +73,7 @@ jobStatus = nan(cluster.numJobs, 1);
 exitCode = nan(cluster.numJobs, 1);
 exitSignal = nan(cluster.numJobs, 1);
 for i = 1 : cluster.numJobs
-    if isfield(cluster.job(i), 'clusterId')
+    if exist(cluster.job(i).log, 'file')
         [status, result] = system(sprintf(...
             'condor_q -userlog "%s" -autoformat JobStatus ExitCode ExitSignal', ...
             cluster.job(i).log));
