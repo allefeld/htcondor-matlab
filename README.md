@@ -186,8 +186,8 @@ job’s *standard output* is redirected to the file `job###_out` and its
 
 
 This software was developed with Matlab R2013a and [HTCondor
-8.2.3](http://research.cs.wisc.edu/htcondor/manual/v8.2.3/index.html) on
-Debian 7.8, but may work with other versions and OSs, too. It is copyrighted ©
-2016 by Carsten Allefeld and released under the terms of the GNU General
+8.2.3](http://research.cs.wisc.edu/htcondor/manual/v8.2.3/index.html) on Debian
+GNU/Linux 7.8, but may work with other versions and OSs, too. It is copyrighted
+© 2016 by Carsten Allefeld and released under the terms of the GNU General
 Public License, version 3 or later.
 
